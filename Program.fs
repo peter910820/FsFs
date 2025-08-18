@@ -8,6 +8,7 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.AspNetCore.Http
 open Giraffe
 
 // ---------------------------------
@@ -56,11 +57,23 @@ let indexHandler (name : string) =
     let view      = Views.index model
     htmlView view
 
+let apiRouter : HttpHandler =
+    choose [
+        // 目前沒有任何 API
+        setStatusCode 404 >=> text "API endpoint not found"
+    ]
+
 let webApp =
     choose [
+        subRoute "/api" apiRouter
         GET >=>
             choose [
-                route "/" >=> indexHandler "world"
+                route "/" >=> fun next ctx ->
+                    task{
+                        let indexPath = Path.Combine(Directory.GetCurrentDirectory(), "WebRoot/dist", "index.html")
+                        do! ctx.Response.SendFileAsync(indexPath)
+                        return Some ctx
+                    }
                 routef "/hello/%s" indexHandler
             ]
         setStatusCode 404 >=> text "Not Found" ]
@@ -109,7 +122,7 @@ let configureLogging (builder : ILoggingBuilder) =
 [<EntryPoint>]
 let main args =
     let contentRoot = Directory.GetCurrentDirectory()
-    let webRoot     = Path.Combine(contentRoot, "WebRoot")
+    let webRoot     = Path.Combine(contentRoot, "WebRoot", "dist")
     Host.CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(
             fun webHostBuilder ->
