@@ -1,0 +1,37 @@
+# Build output
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userprefs
+*.pidb
+*.booproj
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# VS Code settings
+.vscode/
+
+# Rider settings
+.idea/
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Dotnet publish
+publish/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
