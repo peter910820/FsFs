@@ -11,6 +11,8 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.AspNetCore.Http
 open Giraffe
 
+open Routers.ApiRouter
+
 // ---------------------------------
 // Models
 // ---------------------------------
@@ -57,15 +59,9 @@ let indexHandler (name : string) =
     let view      = Views.index model
     htmlView view
 
-let apiRouter : HttpHandler =
-    choose [
-        // 目前沒有任何 API
-        setStatusCode 404 >=> text "API endpoint not found"
-    ]
-
 let webApp =
     choose [
-        subRoute "/api" apiRouter
+        subRoute "/api" apiRoutes
         GET >=>
             choose [
                 route "/" >=> fun next ctx ->
