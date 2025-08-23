@@ -1,0 +1,1 @@
+CONTENT_ROOT=../../WebRoot nohup .bin/publish/SeaottermsSiteFileserver &
