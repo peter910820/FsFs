@@ -122,11 +122,12 @@ let main args =
         .ConfigureWebHostDefaults(
             fun webHostBuilder ->
                 webHostBuilder
+                    .UseUrls("http://127.0.0.1:3052")
                     .UseContentRoot(Directory.GetCurrentDirectory())
                     .UseWebRoot(rootDir)
                     .Configure(Action<IApplicationBuilder> configureApp)
                     .ConfigureServices(configureServices)
-                    .ConfigureLogging(configureLogging)
+                    .ConfigureLogging configureLogging 
                     |> ignore)
         .Build()
         .Run()
