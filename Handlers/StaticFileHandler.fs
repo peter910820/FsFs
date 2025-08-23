@@ -1,7 +1,7 @@
 module SeaottermsSiteFileserver.Handlers.StaticFileHandler
 
-open Giraffe
 open System.IO
+open Giraffe
 open Microsoft.AspNetCore.Http
 
 let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
