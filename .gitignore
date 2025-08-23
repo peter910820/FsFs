@@ -35,5 +35,9 @@ publish/
 # OS files
 .DS_Store
 Thumbs.db
+
 # frontend file
-dist/
+WebRoot/dist/
+
+# resource file
+WebRoot/resource

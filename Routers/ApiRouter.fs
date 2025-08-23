@@ -1,6 +1,7 @@
 module SeaottermsSiteFileserver.Routers.ApiRouter
 
 open Giraffe
+
 let apiRoutes : HttpHandler =
     choose [
         GET >=>

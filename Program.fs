@@ -8,10 +8,12 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
-open Microsoft.AspNetCore.Http
 open Giraffe
 
+open Config
 open Routers.ApiRouter
+open Routers.ResourceRouter
+open Handlers.StaticFileHandler
 
 // ---------------------------------
 // Models
@@ -62,15 +64,14 @@ let indexHandler (name : string) =
 let webApp =
     choose [
         subRoute "/api" apiRoutes
+        subRoute "/resource" staticFileRoutes
         GET >=>
             choose [
-                route "/" >=> fun next ctx ->
-                    task{
-                        let indexPath = Path.Combine(Directory.GetCurrentDirectory(), "WebRoot/dist", "index.html")
-                        do! ctx.Response.SendFileAsync(indexPath)
-                        return Some ctx
-                    }
-                routef "/hello/%s" indexHandler
+                // routef "/hello/%s" indexHandler
+
+                // SPA static file
+                routef "/assets/%s" (serveStaticFile (Path.Combine(rootDir, "dist", "assets")))
+                htmlFile (Path.Combine(rootDir, "dist", "index.html"))
             ]
         setStatusCode 404 >=> text "Not Found" ]
 
@@ -117,14 +118,12 @@ let configureLogging (builder : ILoggingBuilder) =
 
 [<EntryPoint>]
 let main args =
-    let contentRoot = Directory.GetCurrentDirectory()
-    let webRoot     = Path.Combine(contentRoot, "WebRoot", "dist")
     Host.CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(
             fun webHostBuilder ->
                 webHostBuilder
-                    .UseContentRoot(contentRoot)
-                    .UseWebRoot(webRoot)
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseWebRoot(rootDir)
                     .Configure(Action<IApplicationBuilder> configureApp)
                     .ConfigureServices(configureServices)
                     .ConfigureLogging(configureLogging)
