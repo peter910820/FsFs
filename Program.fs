@@ -25,49 +25,15 @@ type Message =
     }
 
 // ---------------------------------
-// Views
-// ---------------------------------
-
-module Views =
-    open Giraffe.ViewEngine
-
-    let layout (content: XmlNode list) =
-        html [] [
-            head [] [
-                title []  [ encodedText "SeaottermsSiteFileserver" ]
-                link [ _rel  "stylesheet"
-                       _type "text/css"
-                       _href "/main.css" ]
-            ]
-            body [] content
-        ]
-
-    let partial () =
-        h1 [] [ encodedText "SeaottermsSiteFileserver" ]
-
-    let index (model : Message) =
-        [
-            partial()
-            p [] [ encodedText model.Text ]
-        ] |> layout
-
-// ---------------------------------
 // Web app
 // ---------------------------------
 
-let indexHandler (name : string) =
-    let greetings = sprintf "Hello %s, from Giraffe!" name
-    let model     = { Text = greetings }
-    let view      = Views.index model
-    htmlView view
-
 let webApp =
     choose [
+        subRoute "/resource" staticFileRoutes
         subRoute "/api" apiRoutes
         GET >=>
             choose [
-                // routef "/hello/%s" indexHandler
-
                 // SPA static file
                 routef "/assets/%s" (serveStaticFile (Path.Combine(rootDir, "dist", "assets")))
                 htmlFile (Path.Combine(rootDir, "dist", "index.html"))
@@ -88,9 +54,9 @@ let errorHandler (ex : Exception) (logger : ILogger) =
 
 let configureCors (builder : CorsPolicyBuilder) =
     builder
-        .WithOrigins(
-            "http://localhost:5000",
-            "https://localhost:5001")
+        // .WithOrigins(
+        //     "http://localhost:5000",
+        //     "https://localhost:5001")
        .AllowAnyMethod()
        .AllowAnyHeader()
        |> ignore
