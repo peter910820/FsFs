@@ -64,7 +64,6 @@ let indexHandler (name : string) =
 let webApp =
     choose [
         subRoute "/api" apiRoutes
-        subRoute "/resource" staticFileRoutes
         GET >=>
             choose [
                 // routef "/hello/%s" indexHandler
