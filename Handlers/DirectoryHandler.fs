@@ -5,7 +5,7 @@ open Giraffe
 
 open SeaottermsSiteFileserver.Config
 
-let safeGetDirectories (rootDir: string) : Result<string[], string> =
+let private safeGetDirectories (rootDir: string) : Result<string[], string> =
     try
         Directory.GetDirectories (Path.Combine(rootDir, "resource"))
         |> Array.map (fun d -> DirectoryInfo(d).Name)
