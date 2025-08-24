@@ -5,7 +5,7 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 
 let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
-    fun _ ctx ->
+    fun next ctx ->
         task {
             let filePath = Path.Combine(folderPath, fileName)
             match filePath with
@@ -24,5 +24,5 @@ let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
                 do! ctx.Response.SendFileAsync filePath
                 return Some ctx
             | _ ->
-                return None
+                return! (setStatusCode 404 >=> json {| error = "File not found" |}) next ctx
         }

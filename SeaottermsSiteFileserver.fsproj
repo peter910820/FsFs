@@ -15,6 +15,7 @@
     <Compile Include="Models/Model.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="Handlers/StaticFileHandler.fs" />
+    <Compile Include="Handlers/DirectoryHanler.fs" />
     <Compile Include="Routers/ApiRouter.fs" />
     <Compile Include="Routers/ResourceRouter.fs" />
     <Compile Include="Program.fs" />
