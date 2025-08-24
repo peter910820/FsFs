@@ -2,7 +2,7 @@ module SeaottermsSiteFileserver.Routers.ApiRouter
 
 open Giraffe
 
-open SeaottermsSiteFileserver.Handlers.DirectoryHanler
+open SeaottermsSiteFileserver.Handlers.DirectoryHandler
 
 let apiRoutes : HttpHandler =
     choose [

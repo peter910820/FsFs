@@ -1,4 +1,4 @@
-module SeaottermsSiteFileserver.Handlers.DirectoryHanler
+module SeaottermsSiteFileserver.Handlers.DirectoryHandler
 
 open System.IO
 open Giraffe
