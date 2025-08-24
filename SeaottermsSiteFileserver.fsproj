@@ -12,6 +12,7 @@
     <PackageReference Include="Giraffe.ViewEngine" Version="1.4.*" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models/Model.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="Handlers/StaticFileHandler.fs" />
     <Compile Include="Routers/ApiRouter.fs" />

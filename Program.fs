@@ -16,15 +16,6 @@ open Routers.ResourceRouter
 open Handlers.StaticFileHandler
 
 // ---------------------------------
-// Models
-// ---------------------------------
-
-type Message =
-    {
-        Text : string
-    }
-
-// ---------------------------------
 // Web app
 // ---------------------------------
 
