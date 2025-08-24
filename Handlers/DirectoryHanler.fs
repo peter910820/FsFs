@@ -7,9 +7,8 @@ open SeaottermsSiteFileserver.Config
 
 let safeGetDirectories (rootDir: string) : Result<string[], string> =
     try
-        Directory.GetDirectories rootDir
+        Directory.GetDirectories (Path.Combine(rootDir, "resource"))
         |> Array.map (fun d -> DirectoryInfo(d).Name)
-        |> Array.filter(fun name -> name <> "dist")
         |> Ok
     with ex -> Error ex.Message
 
