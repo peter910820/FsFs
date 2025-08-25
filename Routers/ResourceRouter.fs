@@ -14,8 +14,8 @@ let staticFileRoutes : HttpHandler =
             choose [
                 routef "/code/%s" (serveStaticFile (Path.Combine(resourceDir, "code")))
                 routef "/image/%s" (serveStaticFile (Path.Combine(resourceDir, "image")))
-                routef "/technology/%s"(serveStaticFile (Path.Combine(resourceDir, "technology")))
-                routef "/test/%s"  (serveStaticFile (Path.Combine(resourceDir, "test")))
+                routef "/technology/%s" (serveStaticFile (Path.Combine(resourceDir, "technology")))
+                routef "/test/%s" (serveStaticFile (Path.Combine(resourceDir, "test")))
                 routef "/test2/%s"  (serveStaticFile (Path.Combine(resourceDir, "test2")))
             ]
     ]

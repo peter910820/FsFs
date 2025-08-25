@@ -4,13 +4,14 @@ open Giraffe
 
 open SeaottermsSiteFileserver.Handlers.DirectoryHandler
 open SeaottermsSiteFileserver.Handlers.FileHandler
+open SeaottermsSiteFileserver.Handlers.UploadHandler
 
 let apiRoutes : HttpHandler =
     choose [
         GET >=>
             choose [
-                route "/directory" >=> listFolders ()
+                route "/directories" >=> listFolders ()
                 route "/files" >=> listFile ()
             ]
-        POST >=> route "/upload" >=> Successful.NO_CONTENT
+        POST >=> routef "/upload/%s" uploadHandler
     ]

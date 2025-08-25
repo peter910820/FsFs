@@ -11,7 +11,7 @@ let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], 
         |> Ok
     with ex -> Error ex.Message
 
-let private safeGetAllFiles  (rootDir: string) : Result<string[], string> =
+let private safeGetAllFiles (rootDir: string) : Result<string[], string> =
     try
         Directory.GetDirectories (Path.Combine(rootDir, "resource"))
         |> Array.collect (fun subDir ->

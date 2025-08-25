@@ -16,6 +16,7 @@
     <Compile Include="Config.fs" />
     <Compile Include="Handlers/StaticFileHandler.fs" />
     <Compile Include="Handlers/DirectoryHandler.fs" />
+    <Compile Include="Handlers/UploadHandler.fs" />
     <Compile Include="Handlers/FileHandler.fs" />
     <Compile Include="Routers/ApiRouter.fs" />
     <Compile Include="Routers/ResourceRouter.fs" />
