@@ -17,6 +17,7 @@
   <ItemGroup>
     <Compile Include="Models/Model.fs" />
     <Compile Include="Config.fs" />
+    <Compile Include="DbConnect.fs" />
     <Compile Include="Handlers/StaticFileHandler.fs" />
     <Compile Include="Handlers/DirectoryHandler.fs" />
     <Compile Include="Handlers/UploadHandler.fs" />

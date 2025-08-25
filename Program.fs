@@ -8,9 +8,11 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.EntityFrameworkCore
 open Giraffe
 
 open Config
+open DbConnect
 open Routers.ApiRouter
 open Routers.ResourceRouter
 open Handlers.StaticFileHandler
@@ -65,8 +67,14 @@ let configureApp (app : IApplicationBuilder) =
         .UseGiraffe(webApp)
 
 let configureServices (services : IServiceCollection) =
+    let connectionString = "Host=localhost;Username=postgres;Password=1234;Database=mydb;Maximum Pool Size=20"
+
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
+
+    services.AddDbContextPool<AppDbContext>(fun options ->
+    options.UseNpgsql(connectionString) |> ignore
+    ) |> ignore
 
 let configureLogging (builder : ILoggingBuilder) =
     builder.AddConsole()

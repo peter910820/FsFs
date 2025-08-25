@@ -1,9 +1,17 @@
 module SeaottermsSiteFileserver.Models.Model
 // ---------------------------------
-// Models
+// Request Models(unuse)
 // ---------------------------------
 
 type Message =
     {
         Text : string
     }
+
+// ---------------------------------
+// DB Models
+// ---------------------------------
+
+type User() =
+    [<DefaultValue>] val mutable Id : int
+    [<DefaultValue>] val mutable Name : string
