@@ -5,6 +5,7 @@ open Giraffe
 open SeaottermsSiteFileserver.Handlers.DirectoryHandler
 open SeaottermsSiteFileserver.Handlers.FileHandler
 open SeaottermsSiteFileserver.Handlers.UploadHandler
+open SeaottermsSiteFileserver.Handlers.LoginHandler
 
 let apiRoutes : HttpHandler =
     choose [
@@ -14,4 +15,5 @@ let apiRoutes : HttpHandler =
                 route "/files" >=> listFile ()
             ]
         POST >=> routef "/upload/%s" uploadHandler
+        POST >=> route "login" >=> loginHandler ()
     ]
