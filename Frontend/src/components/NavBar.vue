@@ -17,12 +17,6 @@
             <i class="material-icons left">folder_open</i>
           </router-link>
         </li>
-        <li>
-          <router-link to="/markdown-writer">
-            文字編輯器
-            <i class="material-icons left">edit_note</i>
-          </router-link>
-        </li>
       </ul>
     </div>
   </nav>
