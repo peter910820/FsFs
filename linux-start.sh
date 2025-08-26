@@ -1,1 +1,1 @@
-CONTENT_ROOT=./WebRoot nohup ./bin/publish/SeaottermsSiteFileserver &
+CONTENT_ROOT=./WebRoot nohup ./Backend/bin/publish/SeaottermsSiteFileserver &

@@ -67,14 +67,14 @@ let configureApp (app : IApplicationBuilder) =
         .UseGiraffe(webApp)
 
 let configureServices (services : IServiceCollection) =
-    let connectionString = "Host=localhost;Username=postgres;Password=1234;Database=mydb;Maximum Pool Size=20"
+    // * let connectionString = "Host=localhost;Username=postgres;Password=1234;Database=mydb;Maximum Pool Size=20"
 
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
-    services.AddDbContextPool<AppDbContext>(fun options ->
-    options.UseNpgsql(connectionString) |> ignore
-    ) |> ignore
+    // * services.AddDbContextPool<AppDbContext>(fun options ->
+    // * options.UseNpgsql(connectionString) |> ignore
+    // * ) |> ignore
 
 let configureLogging (builder : ILoggingBuilder) =
     builder.AddConsole()
