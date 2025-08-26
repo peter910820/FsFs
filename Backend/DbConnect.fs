@@ -2,7 +2,7 @@ module SeaottermsSiteFileserver.DbConnect
 
 open Microsoft.EntityFrameworkCore
 
-open SeaottermsSiteFileserver.Models.Model
+open SeaottermsSiteFileserver.Models.DbModel
 
 type AppDbContext(options: DbContextOptions<AppDbContext>) =
     inherit DbContext(options)

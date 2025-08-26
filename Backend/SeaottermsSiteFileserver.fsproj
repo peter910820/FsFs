@@ -15,9 +15,11 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models/Model.fs" />
+    <Compile Include="Models/DbModel.fs" />
+    <Compile Include="Models/ResponseModel.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="DbConnect.fs" />
+    <Compile Include="Handlers/ErrorHandler.fs" />
     <Compile Include="Handlers/LoginHandler.fs" />
     <Compile Include="Handlers/StaticFileHandler.fs" />
     <Compile Include="Handlers/DirectoryHandler.fs" />

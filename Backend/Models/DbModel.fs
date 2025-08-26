@@ -1,17 +1,8 @@
-module SeaottermsSiteFileserver.Models.Model
+module SeaottermsSiteFileserver.Models.DbModel
 
 open System
 open System.ComponentModel.DataAnnotations
 open System.ComponentModel.DataAnnotations.Schema
-
-// ---------------------------------
-// Request Models(unuse)
-// ---------------------------------
-
-type Message =
-    {
-        Text : string
-    }
 
 // ---------------------------------
 // DB Models

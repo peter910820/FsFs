@@ -16,6 +16,7 @@ open DbConnect
 open Routers.ApiRouter
 open Routers.ResourceRouter
 open Handlers.StaticFileHandler
+open Handlers.ErrorHandler
 
 // ---------------------------------
 // Web app
@@ -32,14 +33,6 @@ let webApp =
                 htmlFile (Path.Combine(rootDir, "dist", "index.html"))
             ]
         setStatusCode 404 >=> text "Not Found" ]
-
-// ---------------------------------
-// Error handler
-// ---------------------------------
-
-let errorHandler (ex : Exception) (logger : ILogger) =
-    logger.LogError(ex, "An unhandled exception has occurred while executing the request.")
-    clearResponse >=> setStatusCode 500 >=> text ex.Message
 
 // ---------------------------------
 // Config and Main
