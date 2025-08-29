@@ -28,8 +28,8 @@ let listFile () : HttpHandler =
         task {
             let handler = 
                 (match ctx.TryGetQueryStringValue "dir" with
-                | Some dir -> safeGetFiles rootDir dir
-                | None -> safeGetAllFiles rootDir)
+                | Some dir -> safeGetFiles config.ContentRoot dir
+                | None -> safeGetAllFiles config.ContentRoot)
                 |> function
                     | Ok files -> setStatusCode 200 >=> json files
                     | Error msg  -> setStatusCode 500 >=> json {| error = msg |}

@@ -13,7 +13,7 @@ let uploadHandler (dirPath: string) : HttpHandler =
                 | false, _ -> return! RequestErrors.BAD_REQUEST "Bad request" next ctx
                 | true, 0  -> return! RequestErrors.BAD_REQUEST "No file uploaded" next ctx
                 | true, _ ->
-                    let fullPath = Path.Combine(rootDir, "resource", dirPath)
+                    let fullPath = Path.Combine(config.ContentRoot, "resource", dirPath)
                     printfn "%s" fullPath
                     match Directory.Exists fullPath with
                     | false -> return! RequestErrors.BAD_REQUEST "Upload directory does not exist" next ctx

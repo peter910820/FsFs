@@ -29,8 +29,8 @@ let webApp =
         GET >=>
             choose [
                 // SPA static file
-                routef "/assets/%s" (serveStaticFile (Path.Combine(rootDir, "dist", "assets")))
-                htmlFile (Path.Combine(rootDir, "dist", "index.html"))
+                routef "/assets/%s" (serveStaticFile (Path.Combine(config.ContentRoot, "dist", "assets")))
+                htmlFile (Path.Combine(config.ContentRoot, "dist", "index.html"))
             ]
         setStatusCode 404 >=> text "Not Found" ]
 
@@ -40,9 +40,10 @@ let webApp =
 
 let configureCors (builder : CorsPolicyBuilder) =
     builder
-        // .WithOrigins(
-        //     "http://localhost:5000",
-        //     "https://localhost:5001")
+        .WithOrigins(
+            "http://localhost:5000",
+            "https://localhost:5001",
+            "http://localhost:5173")
        .AllowAnyMethod()
        .AllowAnyHeader()
        |> ignore
@@ -81,7 +82,7 @@ let main args =
                 webHostBuilder
                     .UseUrls("http://127.0.0.1:3052")
                     .UseContentRoot(Directory.GetCurrentDirectory())
-                    .UseWebRoot(rootDir)
+                    .UseWebRoot(config.ContentRoot)
                     .Configure(Action<IApplicationBuilder> configureApp)
                     .ConfigureServices(configureServices)
                     .ConfigureLogging configureLogging 

@@ -16,7 +16,7 @@ let listFolders () : HttpHandler =
     fun next ctx ->
         task {
             let handler =
-                safeGetDirectories rootDir
+                safeGetDirectories config.ContentRoot
                 |> function
                     | Ok folders -> setStatusCode 200 >=> json folders
                     | Error msg  -> setStatusCode 500 >=> json {| error = msg |}

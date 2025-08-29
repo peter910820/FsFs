@@ -6,7 +6,7 @@ open Giraffe
 open SeaottermsSiteFileserver.Config
 open SeaottermsSiteFileserver.Handlers.StaticFileHandler
 
-let resourceDir = Path.Combine(rootDir, "resource")
+let resourceDir = Path.Combine(config.ContentRoot, "resource")
 
 let staticFileRoutes : HttpHandler =
     choose [
