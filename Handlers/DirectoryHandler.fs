@@ -4,6 +4,7 @@ open System.IO
 open Giraffe
 
 open SeaottermsSiteFileserver.Infrastructure.Config
+open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
 
 let private safeGetDirectories (rootDir: string) : Result<string[], string> =
     try
@@ -19,8 +20,8 @@ let listFolders () : HttpHandler =
             let handler =
                 safeGetDirectories config.ContentRoot
                 |> function
-                    | Ok folders -> setStatusCode 200 >=> json folders
-                    | Error msg -> setStatusCode 500 >=> json {| error = msg |}
+                    | Ok folders -> Successful.ok (responseFactory 200 "獲取fsfs資料夾成功" folders)
+                    | Error msg -> ServerErrors.internalError (responseFactory 500 msg null)
 
             return! handler next ctx
         }

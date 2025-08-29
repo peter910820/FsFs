@@ -4,6 +4,7 @@ open System.IO
 open Giraffe
 
 open SeaottermsSiteFileserver.Infrastructure.Config
+open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
 
 let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], string> =
     try
@@ -29,8 +30,8 @@ let listFile () : HttpHandler =
                  | Some dir -> safeGetFiles config.ContentRoot dir
                  | None -> safeGetAllFiles config.ContentRoot)
                 |> function
-                    | Ok files -> setStatusCode 200 >=> json files
-                    | Error msg -> setStatusCode 500 >=> json {| error = msg |}
+                    | Ok files -> Successful.ok (responseFactory 200 "獲取fsfs檔案成功" files)
+                    | Error msg -> ServerErrors.internalError (responseFactory 500 msg null)
 
             return! handler next ctx
         }

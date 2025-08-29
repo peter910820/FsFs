@@ -7,6 +7,7 @@ open Microsoft.EntityFrameworkCore
 
 open SeaottermsSiteFileserver.Infrastructure.Database
 open SeaottermsSiteFileserver.Models.DtoModel
+open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
 
 let loginHandler () : HttpHandler =
     fun next ctx ->
@@ -19,6 +20,7 @@ let loginHandler () : HttpHandler =
                 |> Async.AwaitTask
 
             match Option.ofObj user with
-            | Some user when BCrypt.Verify(loginData.password, user.Password) -> return! setStatusCode 200 next ctx
-            | _ -> return! setStatusCode 401 next ctx
+            | Some user when BCrypt.Verify(loginData.password, user.Password) ->
+                return! Successful.ok (responseFactory 200 "登入成功" loginData.username) next ctx
+            | _ -> return! (setStatusCode 401 >=> responseFactory 401 "登入失敗" null) next ctx
         }

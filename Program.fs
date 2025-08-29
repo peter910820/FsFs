@@ -15,8 +15,8 @@ open Infrastructure.Config
 open Infrastructure.Database
 open Routers.ApiRouter
 open Routers.ResourceRouter
-open Handlers.StaticFileHandler
 open Handlers.ErrorHandler
+open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
 
 // ---------------------------------
 // Web app
@@ -26,23 +26,14 @@ let webApp =
     choose
         [ subRoute "/resource" staticFileRoutes
           subRoute "/api" apiRoutes
-          GET
-          >=> choose
-                  [
-                    // SPA static file
-                    routef "/assets/%s" (serveStaticFile (Path.Combine(config.ContentRoot, "dist", "assets")))
-                    htmlFile (Path.Combine(config.ContentRoot, "dist", "index.html")) ]
-          setStatusCode 404 >=> text "Not Found" ]
+          RequestErrors.notFound (responseFactory 404 "not found" null) ]
 
 // ---------------------------------
 // Config and Main
 // ---------------------------------
 
 let configureCors (builder: CorsPolicyBuilder) =
-    builder
-        .WithOrigins("http://localhost:5000", "https://localhost:5001", "http://localhost:5173")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
+    builder.WithOrigins("http://localhost:5173").AllowAnyMethod().AllowAnyHeader()
     |> ignore
 
 let configureApp (app: IApplicationBuilder) =
@@ -53,7 +44,8 @@ let configureApp (app: IApplicationBuilder) =
      | false -> app.UseGiraffeErrorHandler(errorHandler).UseHttpsRedirection())
         .UseCors(configureCors)
         .UseStaticFiles()
-        .UseGiraffe(webApp)
+        .UseGiraffe
+        webApp
 
 let configureServices (services: IServiceCollection) =
     let connectionString =

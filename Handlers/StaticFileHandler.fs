@@ -4,6 +4,8 @@ open System.IO
 open Giraffe
 open Microsoft.AspNetCore.Http
 
+open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+
 let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
     fun next ctx ->
         task {
@@ -26,5 +28,5 @@ let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
 
                 do! ctx.Response.SendFileAsync filePath
                 return Some ctx
-            | _ -> return! (setStatusCode 404 >=> json {| error = "File not found" |}) next ctx
+            | _ -> return! RequestErrors.notFound (responseFactory 404 "檔案不存在" null) next ctx
         }
