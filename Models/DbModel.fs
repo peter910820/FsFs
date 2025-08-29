@@ -14,7 +14,6 @@ open System.ComponentModel.DataAnnotations.Schema
 
 [<Table("users")>]
 type User() =
-    [<Key>]
     [<Column("id")>]
     member val Id: int = 0 with get, set
 

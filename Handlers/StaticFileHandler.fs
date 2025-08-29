@@ -8,6 +8,7 @@ let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
     fun next ctx ->
         task {
             let filePath = Path.Combine(folderPath, fileName)
+
             match filePath with
             | path when File.Exists path ->
                 ctx.Response.ContentType <-
@@ -17,12 +18,13 @@ let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
                     | ".css" -> "text/css"
                     | ".html" -> "text/html"
                     | ".png" -> "image/png"
-                    | ".jpg" | ".jpeg" -> "image/jpeg"
+                    | ".jpg"
+                    | ".jpeg" -> "image/jpeg"
                     | ".gif" -> "image/gif"
                     | ".svg" -> "image/svg+xml"
                     | _ -> "application/octet-stream"
+
                 do! ctx.Response.SendFileAsync filePath
                 return Some ctx
-            | _ ->
-                return! (setStatusCode 404 >=> json {| error = "File not found" |}) next ctx
+            | _ -> return! (setStatusCode 404 >=> json {| error = "File not found" |}) next ctx
         }

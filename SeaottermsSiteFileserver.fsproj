@@ -19,8 +19,9 @@
   <ItemGroup>
     <Compile Include="Models/DbModel.fs" />
     <Compile Include="Models/DtoModel.fs" />
-    <Compile Include="Config.fs" />
-    <Compile Include="DbConnect.fs" />
+    <Compile Include="Infrastructure/Config.fs" />
+    <Compile Include="Infrastructure/Database.fs" />
+    <Compile Include="Infrastructure/ResponseFactory.fs" />
     <Compile Include="Handlers/ErrorHandler.fs" />
     <Compile Include="Handlers/LoginHandler.fs" />
     <Compile Include="Handlers/StaticFileHandler.fs" />

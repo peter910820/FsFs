@@ -11,8 +11,8 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.EntityFrameworkCore
 open Giraffe
 
-open Config
-open DbConnect
+open Infrastructure.Config
+open Infrastructure.Database
 open Routers.ApiRouter
 open Routers.ResourceRouter
 open Handlers.StaticFileHandler
@@ -23,86 +23,82 @@ open Handlers.ErrorHandler
 // ---------------------------------
 
 let webApp =
-    choose [
-        subRoute "/resource" staticFileRoutes
-        subRoute "/api" apiRoutes
-        GET >=>
-            choose [
-                // SPA static file
-                routef "/assets/%s" (serveStaticFile (Path.Combine(config.ContentRoot, "dist", "assets")))
-                htmlFile (Path.Combine(config.ContentRoot, "dist", "index.html"))
-            ]
-        setStatusCode 404 >=> text "Not Found" ]
+    choose
+        [ subRoute "/resource" staticFileRoutes
+          subRoute "/api" apiRoutes
+          GET
+          >=> choose
+                  [
+                    // SPA static file
+                    routef "/assets/%s" (serveStaticFile (Path.Combine(config.ContentRoot, "dist", "assets")))
+                    htmlFile (Path.Combine(config.ContentRoot, "dist", "index.html")) ]
+          setStatusCode 404 >=> text "Not Found" ]
 
 // ---------------------------------
 // Config and Main
 // ---------------------------------
 
-let configureCors (builder : CorsPolicyBuilder) =
+let configureCors (builder: CorsPolicyBuilder) =
     builder
-        .WithOrigins(
-            "http://localhost:5000",
-            "https://localhost:5001",
-            "http://localhost:5173")
-       .AllowAnyMethod()
-       .AllowAnyHeader()
-       |> ignore
+        .WithOrigins("http://localhost:5000", "https://localhost:5001", "http://localhost:5173")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+    |> ignore
 
-let configureApp (app : IApplicationBuilder) =
+let configureApp (app: IApplicationBuilder) =
     let env = app.ApplicationServices.GetService<IWebHostEnvironment>()
+
     (match env.IsDevelopment() with
-    | true  ->
-        app.UseDeveloperExceptionPage()
-    | false ->
-        app .UseGiraffeErrorHandler(errorHandler)
-            .UseHttpsRedirection())
+     | true -> app.UseDeveloperExceptionPage()
+     | false -> app.UseGiraffeErrorHandler(errorHandler).UseHttpsRedirection())
         .UseCors(configureCors)
         .UseStaticFiles()
         .UseGiraffe(webApp)
 
-let configureServices (services : IServiceCollection) =
-    let connectionString = sprintf "Host=%s;Username=%s;Password=%s;Database=%s;Maximum Pool Size=%s"
-                            config.DbHost
-                            config.DbUsername
-                            config.DbPassword
-                            config.DbName
-                            config.DbMaxPoolSize
+let configureServices (services: IServiceCollection) =
+    let connectionString =
+        sprintf
+            "Host=%s;Username=%s;Password=%s;Database=%s;Maximum Pool Size=%s"
+            config.DbHost
+            config.DbUsername
+            config.DbPassword
+            config.DbName
+            config.DbMaxPoolSize
 
-    services.AddCors()    |> ignore
+    services.AddCors() |> ignore
     services.AddGiraffe() |> ignore
 
-    services.AddDbContextPool<AppDbContext>(fun options ->
-    options.UseNpgsql connectionString |> ignore
-    ) |> ignore
+    services.AddDbContextPool<AppDbContext>(fun options -> options.UseNpgsql connectionString |> ignore)
+    |> ignore
 
-let configureLogging (builder : ILoggingBuilder) =
-    builder.AddConsole()
-           .AddDebug() |> ignore
+let configureLogging (builder: ILoggingBuilder) =
+    builder.AddConsole().AddDebug() |> ignore
 
 [<EntryPoint>]
 let main args =
     let host =
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(
-                fun webHostBuilder ->
-                    webHostBuilder
-                        .UseUrls(config.RuntimePort)
-                        .UseContentRoot(Directory.GetCurrentDirectory())
-                        .UseWebRoot(config.ContentRoot)
-                        .Configure(Action<IApplicationBuilder> configureApp)
-                        .ConfigureServices(configureServices)
-                        .ConfigureLogging configureLogging 
-                        |> ignore)
+        Host
+            .CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(fun webHostBuilder ->
+                webHostBuilder
+                    .UseUrls(config.RuntimePort)
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseWebRoot(config.ContentRoot)
+                    .Configure(Action<IApplicationBuilder> configureApp)
+                    .ConfigureServices(configureServices)
+                    .ConfigureLogging
+                    configureLogging
+                |> ignore)
             .Build()
 
     // 立即執行SQL連線，若連線失敗會直接關閉程式
     checkDbConnection host.Services
     |> Async.RunSynchronously
     |> function
-        | Ok () -> printfn "✅ Database connection successful."
-        | Error msg -> 
+        | Ok() -> printfn "✅ Database connection successful."
+        | Error msg ->
             printfn "❌ Database connection failed: %s" msg
             Environment.Exit 1
-            
+
     host.Run()
     0
