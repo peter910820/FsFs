@@ -1,10 +1,10 @@
-module SeaottermsSiteFileserver.Handlers.DirectoryHandler
+module FsFs.Handlers.DirectoryHandler
 
 open System.IO
 open Giraffe
 
-open SeaottermsSiteFileserver.Infrastructure.Config
-open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+open FsFs.Infrastructure.Config
+open FsFs.Infrastructure.ResponseFactory
 
 let private safeGetDirectories (rootDir: string) : Result<string[], string> =
     try

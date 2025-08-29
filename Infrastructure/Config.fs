@@ -1,4 +1,4 @@
-module SeaottermsSiteFileserver.Infrastructure.Config
+module FsFs.Infrastructure.Config
 
 open System
 open dotenv.net

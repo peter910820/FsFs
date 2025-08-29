@@ -1,10 +1,10 @@
-module SeaottermsSiteFileserver.Handlers.ErrorHandler
+module FsFs.Handlers.ErrorHandler
 
 open System
 open Microsoft.Extensions.Logging
 open Giraffe
 
-open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+open FsFs.Infrastructure.ResponseFactory
 
 // ---------------------------------
 // Error handler

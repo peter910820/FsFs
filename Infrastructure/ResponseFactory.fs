@@ -1,8 +1,8 @@
-module SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+module FsFs.Infrastructure.ResponseFactory
 
 open Giraffe
 
-open SeaottermsSiteFileserver.Models.DtoModel
+open FsFs.Models.DtoModel
 
 
 let responseFactory (statusCode: int) (msg: string) (data: 'T) : HttpHandler =

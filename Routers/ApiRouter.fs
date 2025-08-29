@@ -1,11 +1,11 @@
-module SeaottermsSiteFileserver.Routers.ApiRouter
+module FsFs.Routers.ApiRouter
 
 open Giraffe
 
-open SeaottermsSiteFileserver.Handlers.DirectoryHandler
-open SeaottermsSiteFileserver.Handlers.FileHandler
-open SeaottermsSiteFileserver.Handlers.UploadHandler
-open SeaottermsSiteFileserver.Handlers.LoginHandler
+open FsFs.Handlers.DirectoryHandler
+open FsFs.Handlers.FileHandler
+open FsFs.Handlers.UploadHandler
+open FsFs.Handlers.LoginHandler
 
 let apiRoutes: HttpHandler =
     choose

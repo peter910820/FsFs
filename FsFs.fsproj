@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <AssemblyName>SeaottermsSiteFileserver</AssemblyName>
+    <AssemblyName>FsFs</AssemblyName>
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>

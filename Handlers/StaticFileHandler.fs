@@ -1,10 +1,10 @@
-module SeaottermsSiteFileserver.Handlers.StaticFileHandler
+module FsFs.Handlers.StaticFileHandler
 
 open System.IO
 open Giraffe
 open Microsoft.AspNetCore.Http
 
-open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+open FsFs.Infrastructure.ResponseFactory
 
 let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
     fun next ctx ->

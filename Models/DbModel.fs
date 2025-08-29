@@ -1,4 +1,4 @@
-module SeaottermsSiteFileserver.Models.DbModel
+module FsFs.Models.DbModel
 
 open System
 open System.ComponentModel.DataAnnotations

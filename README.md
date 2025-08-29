@@ -1,5 +1,5 @@
-# seaotterms-site-fileserver
-My all site proprietary fileserver
+# FsFs
+My fileserver make with F# Giraffe
 
 ## 2025/08/26
 

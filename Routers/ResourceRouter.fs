@@ -1,10 +1,10 @@
-module SeaottermsSiteFileserver.Routers.ResourceRouter
+module FsFs.Routers.ResourceRouter
 
 open System.IO
 open Giraffe
 
-open SeaottermsSiteFileserver.Infrastructure.Config
-open SeaottermsSiteFileserver.Handlers.StaticFileHandler
+open FsFs.Infrastructure.Config
+open FsFs.Handlers.StaticFileHandler
 
 let resourceDir = Path.Combine(config.ContentRoot, "resource")
 

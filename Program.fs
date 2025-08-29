@@ -1,4 +1,4 @@
-module SeaottermsSiteFileserver.App
+module FsFs.App
 
 open System
 open System.IO
@@ -16,7 +16,7 @@ open Infrastructure.Database
 open Routers.ApiRouter
 open Routers.ResourceRouter
 open Handlers.ErrorHandler
-open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+open FsFs.Infrastructure.ResponseFactory
 
 // ---------------------------------
 // Web app

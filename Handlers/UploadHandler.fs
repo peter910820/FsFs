@@ -1,10 +1,10 @@
-module SeaottermsSiteFileserver.Handlers.UploadHandler
+module FsFs.Handlers.UploadHandler
 
 open System.IO
 open Giraffe
 
-open SeaottermsSiteFileserver.Infrastructure.Config
-open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+open FsFs.Infrastructure.Config
+open FsFs.Infrastructure.ResponseFactory
 
 let uploadHandler (dirPath: string) : HttpHandler =
     fun next ctx ->

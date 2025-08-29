@@ -1,13 +1,13 @@
-module SeaottermsSiteFileserver.Handlers.LoginHandler
+module FsFs.Handlers.LoginHandler
 
 open BCrypt.Net
 open System.Linq
 open Giraffe
 open Microsoft.EntityFrameworkCore
 
-open SeaottermsSiteFileserver.Infrastructure.Database
-open SeaottermsSiteFileserver.Models.DtoModel
-open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+open FsFs.Infrastructure.Database
+open FsFs.Models.DtoModel
+open FsFs.Infrastructure.ResponseFactory
 
 let loginHandler () : HttpHandler =
     fun next ctx ->

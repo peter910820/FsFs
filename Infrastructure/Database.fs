@@ -1,4 +1,4 @@
-module SeaottermsSiteFileserver.Infrastructure.Database
+module FsFs.Infrastructure.Database
 
 open Microsoft.EntityFrameworkCore
 open System
@@ -7,7 +7,7 @@ open Microsoft.EntityFrameworkCore
 open System.Linq
 
 
-open SeaottermsSiteFileserver.Models.DbModel
+open FsFs.Models.DbModel
 
 type AppDbContext(options: DbContextOptions<AppDbContext>) =
     inherit DbContext(options)

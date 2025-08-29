@@ -1,4 +1,4 @@
-module SeaottermsSiteFileserver.Models.DtoModel
+module FsFs.Models.DtoModel
 
 // ---------------------------------
 // Response Models(unuse)

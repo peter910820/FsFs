@@ -1,10 +1,10 @@
-module SeaottermsSiteFileserver.Handlers.FileHandler
+module FsFs.Handlers.FileHandler
 
 open System.IO
 open Giraffe
 
-open SeaottermsSiteFileserver.Infrastructure.Config
-open SeaottermsSiteFileserver.Infrastructure.ResponseFactory
+open FsFs.Infrastructure.Config
+open FsFs.Infrastructure.ResponseFactory
 
 let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], string> =
     try
