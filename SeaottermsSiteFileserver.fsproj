@@ -8,6 +8,7 @@
     <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="dotenv.net" Version="4.0.0" />
     <PackageReference Include="Giraffe" Version="6.4.0" />
     <PackageReference Include="Giraffe.ViewEngine" Version="1.4.*" />
@@ -17,7 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models/DbModel.fs" />
-    <Compile Include="Models/ResponseModel.fs" />
+    <Compile Include="Models/DtoModel.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="DbConnect.fs" />
     <Compile Include="Handlers/ErrorHandler.fs" />

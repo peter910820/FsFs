@@ -8,41 +8,46 @@ open System.ComponentModel.DataAnnotations.Schema
 // DB Models
 // ---------------------------------
 
+open System
+open System.ComponentModel.DataAnnotations
+open System.ComponentModel.DataAnnotations.Schema
+
+[<Table("users")>]
 type User() =
     [<Key>]
     [<Column("id")>]
-    [<DefaultValue>] val mutable Id : uint32
+    member val Id: int = 0 with get, set
 
     [<Column("username")>]
     [<Required>]
-    [<DefaultValue>] val mutable Username : string
+    member val Username: string = "" with get, set
 
     [<Column("password")>]
     [<Required>]
-    [<DefaultValue>] val mutable Password : string
+    member val Password: string = "" with get, set
 
     [<Column("email")>]
     [<Required>]
-    [<DefaultValue>] val mutable Email : string
+    member val Email: string = "" with get, set
 
     [<Column("avatar")>]
-    [<DefaultValue>] val mutable Avatar : string
+    member val Avatar: string = "" with get, set
 
     [<Column("exp")>]
-    [<DefaultValue>] val mutable Exp : int
+    member val Exp: int = 0 with get, set
 
     [<Column("management")>]
-    [<DefaultValue>] val mutable Management : bool
+    member val Management: bool = false with get, set
 
     [<Column("created_at")>]
-    [<DefaultValue>] val mutable CreatedAt : DateTime
+    member val CreatedAt: DateTime = DateTime.MinValue with get, set
 
     [<Column("create_name")>]
     [<Required>]
-    [<DefaultValue>] val mutable CreateName : string
+    member val CreateName: string = "" with get, set
 
     [<Column("updated_at")>]
-    [<DefaultValue>] val mutable UpdatedAt : DateTime
+    member val UpdatedAt: DateTime = DateTime.MinValue with get, set
 
     [<Column("update_name")>]
-    [<DefaultValue>] val mutable UpdateName : string
+    member val UpdateName: string = "" with get, set

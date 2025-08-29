@@ -15,5 +15,5 @@ let apiRoutes : HttpHandler =
                 route "/files" >=> listFile ()
             ]
         POST >=> routef "/upload/%s" uploadHandler
-        POST >=> route "login" >=> loginHandler ()
+        POST >=> route "/login" >=> loginHandler ()
     ]

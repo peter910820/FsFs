@@ -9,5 +9,5 @@ open Giraffe
 // ---------------------------------
 
 let errorHandler (ex : Exception) (logger : ILogger) =
-    logger.LogError(ex, "An unhandled exception has occurred while executing the request.")
-    clearResponse >=> setStatusCode 500 >=> text ex.Message
+    logger.LogError(ex, ex.Message)
+    clearResponse >=> setStatusCode 500 >=> text "發生內部錯誤，請聯繫管理員"

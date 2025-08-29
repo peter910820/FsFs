@@ -61,14 +61,19 @@ let configureApp (app : IApplicationBuilder) =
         .UseGiraffe(webApp)
 
 let configureServices (services : IServiceCollection) =
-    // * let connectionString = "Host=localhost;Username=postgres;Password=1234;Database=mydb;Maximum Pool Size=20"
+    let connectionString = sprintf "Host=%s;Username=%s;Password=%s;Database=%s;Maximum Pool Size=%s"
+                            config.DbHost
+                            config.DbUsername
+                            config.DbPassword
+                            config.DbName
+                            config.DbMaxPoolSize
 
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
-    // * services.AddDbContextPool<AppDbContext>(fun options ->
-    // * options.UseNpgsql(connectionString) |> ignore
-    // * ) |> ignore
+    services.AddDbContextPool<AppDbContext>(fun options ->
+    options.UseNpgsql connectionString |> ignore
+    ) |> ignore
 
 let configureLogging (builder : ILoggingBuilder) =
     builder.AddConsole()
@@ -76,17 +81,28 @@ let configureLogging (builder : ILoggingBuilder) =
 
 [<EntryPoint>]
 let main args =
-    Host.CreateDefaultBuilder(args)
-        .ConfigureWebHostDefaults(
-            fun webHostBuilder ->
-                webHostBuilder
-                    .UseUrls("http://127.0.0.1:3052")
-                    .UseContentRoot(Directory.GetCurrentDirectory())
-                    .UseWebRoot(config.ContentRoot)
-                    .Configure(Action<IApplicationBuilder> configureApp)
-                    .ConfigureServices(configureServices)
-                    .ConfigureLogging configureLogging 
-                    |> ignore)
-        .Build()
-        .Run()
+    let host =
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(
+                fun webHostBuilder ->
+                    webHostBuilder
+                        .UseUrls(config.RuntimePort)
+                        .UseContentRoot(Directory.GetCurrentDirectory())
+                        .UseWebRoot(config.ContentRoot)
+                        .Configure(Action<IApplicationBuilder> configureApp)
+                        .ConfigureServices(configureServices)
+                        .ConfigureLogging configureLogging 
+                        |> ignore)
+            .Build()
+
+    // 立即執行SQL連線，若連線失敗會直接關閉程式
+    checkDbConnection host.Services
+    |> Async.RunSynchronously
+    |> function
+        | Ok () -> printfn "✅ Database connection successful."
+        | Error msg -> 
+            printfn "❌ Database connection failed: %s" msg
+            Environment.Exit 1
+            
+    host.Run()
     0
