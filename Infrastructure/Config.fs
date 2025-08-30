@@ -2,8 +2,15 @@ module FsFs.Infrastructure.Config
 
 open System
 open dotenv.net
+open Microsoft.Extensions.Caching.Memory
 
 DotEnv.Load()
+
+// ----------------------------
+// MemoryCache 初始化
+// ----------------------------
+let cache = new MemoryCache(MemoryCacheOptions())
+
 
 type AppConfig =
     { DbHost: string

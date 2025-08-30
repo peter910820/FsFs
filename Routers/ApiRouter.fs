@@ -6,10 +6,12 @@ open FsFs.Handlers.DirectoryHandler
 open FsFs.Handlers.FileHandler
 open FsFs.Handlers.UploadHandler
 open FsFs.Handlers.LoginHandler
+open FsFs.Handlers.AuthHandler
 
 let apiRoutes: HttpHandler =
     choose
         [ GET
           >=> choose [ route "/directories" >=> listFolders (); route "/files" >=> listFile () ]
           POST >=> routef "/upload/%s" uploadHandler
-          POST >=> route "/login" >=> loginHandler () ]
+          POST >=> route "/login" >=> loginHandler ()
+          POST >=> route "/auth" >=> authHandler () ]
