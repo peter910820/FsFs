@@ -8,7 +8,9 @@ open FsFs.Infrastructure.ResponseFactory
 
 let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], string> =
     try
-        Directory.GetFiles(Path.Combine(rootDir, "resource", subPath)) |> Ok
+        Directory.GetFiles(Path.Combine(rootDir, "resource", subPath))
+        |> Array.map (fun file -> Path.GetRelativePath(rootDir, file))
+        |> Ok
     with ex ->
         Error ex.Message
 
