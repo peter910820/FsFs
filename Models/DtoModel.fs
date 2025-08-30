@@ -2,20 +2,16 @@ module FsFs.Models.DtoModel
 
 open System
 
-/// <summary>
-/// Request DTO的結構定義
-/// </summary>
+/// <summary>Request DTO的結構定義</summary>
 module Request =
     type LoginRequest = { username: string; password: string }
 
-/// <summary>
-/// Response DTO的結構定義
-/// </summary>
+/// <summary>Response DTO的結構定義</summary>
 module Response =
     type ApiResponse<'T> =
         { StatusCode: int
-          Data: 'T
-          Msg: string }
+          Msg: string
+          Data: 'T option }
 
     type LoginResponse =
         { Token: string
