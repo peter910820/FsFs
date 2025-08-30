@@ -79,8 +79,8 @@ let main args =
                     .UseWebRoot(config.ContentRoot)
                     .Configure(Action<IApplicationBuilder> configureApp)
                     .ConfigureServices(configureServices)
-                    .ConfigureLogging
-                    configureLogging
+                    .ConfigureLogging(configureLogging)
+                    .ConfigureKestrel(fun options -> options.Limits.MaxRequestBodySize <- 50L * 1024L * 1024L) // 50 MB
                 |> ignore)
             .Build()
 
