@@ -6,7 +6,7 @@ open FsFs.Models.DtoModel
 
 
 let responseFactory (statusCode: int) (msg: string) (data: 'T) : HttpHandler =
-    let resp: ApiResponse<'T> =
+    let resp: Response.ApiResponse<'T> =
         { StatusCode = statusCode
           Msg = msg
           Data = data }

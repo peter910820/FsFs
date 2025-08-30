@@ -12,7 +12,7 @@ open FsFs.Infrastructure.ResponseFactory
 let loginHandler () : HttpHandler =
     fun next ctx ->
         task {
-            let! loginData = ctx.BindJsonAsync<LoginRequest>()
+            let! loginData = ctx.BindJsonAsync<Request.LoginRequest>()
             let db = ctx.GetService<AppDbContext>()
 
             let! user =

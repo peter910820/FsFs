@@ -8,10 +8,6 @@ open System.ComponentModel.DataAnnotations.Schema
 // DB Models
 // ---------------------------------
 
-open System
-open System.ComponentModel.DataAnnotations
-open System.ComponentModel.DataAnnotations.Schema
-
 [<Table("users")>]
 type User() =
     [<Column("id")>]
