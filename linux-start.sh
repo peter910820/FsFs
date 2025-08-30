@@ -1,1 +1,1 @@
-CONTENT_ROOT=./WebRoot nohup ./bin/publish/FsFs &
+nohup ./bin/publish/FsFs &
