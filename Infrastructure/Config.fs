@@ -19,7 +19,8 @@ type AppConfig =
       DbName: string
       DbMaxPoolSize: string
       ContentRoot: string
-      RuntimePort: string }
+      RuntimePort: string
+      Domain: string }
 
 let private checkEnvKey key =
     match Environment.GetEnvironmentVariable key with
@@ -33,4 +34,5 @@ let config =
       DbName = checkEnvKey "DB_NAME"
       DbMaxPoolSize = checkEnvKey "DB_MAX_POOL_SIZE"
       ContentRoot = checkEnvKey "CONTENT_ROOT"
-      RuntimePort = checkEnvKey "RUNTIME_PORT" }
+      RuntimePort = checkEnvKey "RUNTIME_PORT"
+      Domain = checkEnvKey "DOMAIN"}

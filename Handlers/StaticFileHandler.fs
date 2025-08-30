@@ -15,10 +15,11 @@ let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
             | path when File.Exists path ->
                 ctx.Response.ContentType <-
                     match Path.GetExtension(filePath).ToLower() with
-                    | ".js" -> "text/javascript"
-                    | ".mjs" -> "text/javascript"
-                    | ".css" -> "text/css"
-                    | ".html" -> "text/html"
+                    | ".js" -> "text/javascript;"
+                    | ".mjs" -> "text/javascript;"
+                    | ".cjs" -> "text/javascript;"
+                    | ".css" -> "text/css;"
+                    | ".html" -> "text/html;"
                     | ".png" -> "image/png"
                     | ".jpg"
                     | ".jpeg" -> "image/jpeg"

@@ -36,7 +36,7 @@ let loginHandler () : HttpHandler =
                         HttpOnly = true,
                         Secure = true,
                         SameSite = SameSiteMode.None, // 跨子網域
-                        Domain = ".example.com",
+                        Domain = config.Domain,
                         Path = "/",
                         Expires = Nullable(DateTimeOffset.UtcNow.AddMinutes 30.0)
                     )
