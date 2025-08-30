@@ -34,7 +34,7 @@ let webApp =
 // ---------------------------------
 
 let configureCors (builder: CorsPolicyBuilder) =
-    builder.WithOrigins(config.AllowCors).AllowAnyMethod().AllowAnyHeader()
+    builder.WithOrigins(config.AllowCors).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
     |> ignore
 
 let configureApp (app: IApplicationBuilder) =
