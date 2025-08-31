@@ -16,4 +16,4 @@ let apiRoutes: HttpHandler =
           POST >=> routef "/upload/%s" uploadHandler
           POST >=> route "/login" >=> loginHandler ()
           POST >=> route "/auth" >=> authHandler ()
-          POST >=> route "/create-directory" >=> createDirectoryHandler () ]
+          POST >=> routef "/create-directory/%s" createDirectoryHandler ]
