@@ -22,6 +22,7 @@
     <Compile Include="Infrastructure/Config.fs" />
     <Compile Include="Infrastructure/Database.fs" />
     <Compile Include="Infrastructure/ResponseFactory.fs" />
+    <Compile Include="Infrastructure/Middlware.fs" />
     <Compile Include="Handlers/ErrorHandler.fs" />
     <Compile Include="Handlers/AuthHandler.fs" />
     <Compile Include="Handlers/CreateDirectoryHandler.fs" />
