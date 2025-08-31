@@ -2,6 +2,7 @@ module FsFs.Handlers.FileHandler
 
 open System.IO
 open Giraffe
+open Microsoft.AspNetCore.Http
 
 open FsFs.Infrastructure.Config
 open FsFs.Infrastructure.ResponseFactory
@@ -32,8 +33,8 @@ let listFile () : HttpHandler =
                  | Some dir -> safeGetFiles config.ContentRoot dir
                  | None -> safeGetAllFiles config.ContentRoot)
                 |> function
-                    | Ok files -> Successful.ok (responseFactory 200 "獲取fsfs檔案成功" files)
-                    | Error msg -> ServerErrors.internalError (responseFactory 500 msg null)
+                    | Ok files -> responseFactory StatusCodes.Status200OK "獲取fsfs檔案成功" files
+                    | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg null
 
             return! handler next ctx
         }

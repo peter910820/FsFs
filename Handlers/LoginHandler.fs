@@ -42,6 +42,6 @@ let loginHandler () : HttpHandler =
                     )
                 )
 
-                return! Successful.ok (responseFactory 200 "登入成功" loginData.username) next ctx
-            | _ -> return! (setStatusCode 401 >=> responseFactory 401 "登入失敗" null) next ctx
+                return! responseFactory StatusCodes.Status200OK "登入成功" loginData.username next ctx
+            | _ -> return! responseFactory StatusCodes.Status401Unauthorized "登入失敗" null next ctx
         }

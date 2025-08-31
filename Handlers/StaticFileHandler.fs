@@ -29,5 +29,5 @@ let serveStaticFile (folderPath: string) (fileName: string) : HttpHandler =
 
                 do! ctx.Response.SendFileAsync filePath
                 return Some ctx
-            | _ -> return! RequestErrors.notFound (responseFactory 404 "檔案不存在" null) next ctx
+            | _ -> return! responseFactory StatusCodes.Status404NotFound "檔案不存在" null next ctx
         }

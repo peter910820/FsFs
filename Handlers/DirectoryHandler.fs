@@ -2,6 +2,7 @@ module FsFs.Handlers.DirectoryHandler
 
 open System.IO
 open Giraffe
+open Microsoft.AspNetCore.Http
 
 open FsFs.Infrastructure.Config
 open FsFs.Infrastructure.ResponseFactory
@@ -20,8 +21,8 @@ let listFolders () : HttpHandler =
             let handler =
                 safeGetDirectories config.ContentRoot
                 |> function
-                    | Ok folders -> Successful.ok (responseFactory 200 "獲取fsfs資料夾成功" folders)
-                    | Error msg -> ServerErrors.internalError (responseFactory 500 msg null)
+                    | Ok folders -> responseFactory StatusCodes.Status200OK "獲取fsfs資料夾成功" folders
+                    | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg null
 
             return! handler next ctx
         }

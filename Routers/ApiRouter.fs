@@ -15,8 +15,8 @@ let apiRoutes: HttpHandler =
         [ GET
           >=> choose [ route "/directories" >=> listFolders (); route "/files" >=> listFile () ]
           POST
-          >=> routef "/upload/%s" (fun fileName -> authMiddleware >=> uploadHandler fileName)
-          POST >=> route "/login" >=> loginHandler ()
-          POST >=> route "/auth" >=> authHandler ()
-          POST
-          >=> routef "/create-directory/%s" (fun dirName -> authMiddleware >=> createDirectoryHandler dirName) ]
+          >=> choose
+                  [ route "/auth" >=> authMiddleware >=> authHandler ()
+                    route "/login" >=> loginHandler ()
+                    routef "/upload/%s" (fun fileName -> authMiddleware >=> uploadHandler fileName)
+                    routef "/create-directory/%s" (fun dirName -> authMiddleware >=> createDirectoryHandler dirName) ] ]
