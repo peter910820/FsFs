@@ -8,12 +8,15 @@ open FsFs.Infrastructure.Config
 open FsFs.Infrastructure.ResponseFactory
 
 let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], string> =
-    try
-        Directory.GetFiles(Path.Combine(rootDir, "resource", subPath))
-        |> Array.map (fun file -> Path.GetRelativePath(rootDir, file))
-        |> Ok
-    with ex ->
-        Error ex.Message
+    if subPath.Contains "/" || subPath.Contains ".." then
+        Error "Invalid path"
+    else
+        try
+                Directory.GetFiles(Path.Combine(rootDir, "resource", subPath))
+                |> Array.map (fun file -> Path.GetRelativePath(rootDir, file))
+                |> Ok
+        with ex ->
+            Error ex.Message
 
 let private safeGetAllFiles (rootDir: string) : Result<string[], string> =
     try
