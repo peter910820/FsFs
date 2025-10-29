@@ -24,7 +24,7 @@ open FsFs.Infrastructure.ResponseFactory
 
 let webApp =
     choose
-        [ subRoute "/resource" staticFileRoutes
+        [ if config.StartMode = "Manual" then subRoute "/resource" staticFileRoutes
           subRoute "/api" apiRoutes
           RequestErrors.notFound (responseFactory 404 "not found" null) ]
 

@@ -21,7 +21,8 @@ type AppConfig =
       ContentRoot: string
       RuntimePort: string
       Domain: string
-      AllowCors: string }
+      AllowCors: string
+      StartMode: string }
 
 let private checkEnvKey key =
     match Environment.GetEnvironmentVariable key with
@@ -37,4 +38,5 @@ let config =
       ContentRoot = checkEnvKey "CONTENT_ROOT"
       RuntimePort = checkEnvKey "RUNTIME_PORT"
       Domain = checkEnvKey "DOMAIN"
-      AllowCors = checkEnvKey "ALLOW_CORS" }
+      AllowCors = checkEnvKey "ALLOW_CORS"
+      StartMode = checkEnvKey "START_MODE" }
