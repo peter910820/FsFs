@@ -1,1 +1,0 @@
-nohup ./bin/publish/FsFs &
