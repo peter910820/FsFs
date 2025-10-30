@@ -13,23 +13,11 @@ open Giraffe
 
 open Infrastructure.Config
 open Infrastructure.Database
-open Routers.ApiRouter
-open Routers.ResourceRouter
+open Routers.RootRouter
 open Handlers.ErrorHandler
-open FsFs.Infrastructure.ResponseFactory
 
 // ---------------------------------
-// Web app
-// ---------------------------------
-
-let webApp =
-    choose
-        [ if config.StartMode = "Manual" then subRoute "/resource" staticFileRoutes
-          subRoute "/api" apiRoutes
-          RequestErrors.notFound (responseFactory 404 "not found" null) ]
-
-// ---------------------------------
-// Config and Main
+// Main
 // ---------------------------------
 
 let configureCors (builder: CorsPolicyBuilder) =
@@ -49,13 +37,14 @@ let configureApp (app: IApplicationBuilder) =
 
 let configureServices (services: IServiceCollection) =
     let connectionString =
-        sprintf
-            "Host=%s;Username=%s;Password=%s;Database=%s;Maximum Pool Size=%s"
-            config.DbHost
-            config.DbUsername
-            config.DbPassword
-            config.DbName
-            config.DbMaxPoolSize
+        [
+            $"Host={config.DbHost}"
+            $"Username={config.DbUsername}"
+            $"Password={config.DbPassword}"
+            $"Database={config.DbName}"
+            $"Maximum Pool Size={config.DbMaxPoolSize}"
+        ]
+        |> String.concat ";"
 
     services.AddCors() |> ignore
     services.AddGiraffe() |> ignore

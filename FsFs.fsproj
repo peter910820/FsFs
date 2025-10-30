@@ -33,6 +33,7 @@
     <Compile Include="Handlers/FileHandler.fs" />
     <Compile Include="Routers/ApiRouter.fs" />
     <Compile Include="Routers/ResourceRouter.fs" />
+    <Compile Include="Routers/RootRouter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
