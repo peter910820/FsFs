@@ -4,6 +4,10 @@ open System
 open dotenv.net
 open Microsoft.Extensions.Caching.Memory
 
+// ----------------------------
+// Config以及MemoryCache 初始化， 整個檔案都是以產生副作用的前提下運作的
+// ----------------------------
+
 DotEnv.Load()
 
 // ----------------------------
