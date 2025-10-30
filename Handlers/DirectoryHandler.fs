@@ -9,7 +9,7 @@ open FsFs.Infrastructure.ResponseFactory
 
 let private safeGetDirectories (rootDir: string) : Result<string[], string> =
     try
-        Directory.GetDirectories(Path.Combine(rootDir, "resource"))
+        Directory.GetDirectories(Path.Combine rootDir)
         |> Array.map (fun d -> DirectoryInfo(d).Name)
         |> Ok
     with ex ->

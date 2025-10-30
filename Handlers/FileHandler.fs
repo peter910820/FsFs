@@ -18,7 +18,7 @@ let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], 
         Error "Invalid path"
     else
         try
-            Directory.GetFiles(Path.Combine(rootDir, "resource", subPath))
+            Directory.GetFiles(Path.Combine(rootDir, subPath))
             |> Array.map (fun file -> Path.GetRelativePath(rootDir, file))
             |> Ok
         with ex ->
@@ -26,7 +26,7 @@ let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], 
 
 let private safeGetAllFiles (rootDir: string) : Result<string[], string> =
     try
-        Directory.GetDirectories(Path.Combine(rootDir, "resource"))
+        Directory.GetDirectories(Path.Combine rootDir)
         |> Array.collect (fun subDir ->
             Directory.GetFiles subDir
             |> Array.map (fun file -> Path.GetRelativePath(rootDir, file)))
@@ -64,7 +64,7 @@ let deleteFileHandler (fileName: string) : HttpHandler =
     fun next ctx ->
         task {
             let handler =
-              match safeDeleteFile (Path.Combine(config.ContentRoot, "resource", fileName)) with
+              match safeDeleteFile (Path.Combine(config.ContentRoot, fileName)) with
               | Ok () -> responseFactory StatusCodes.Status200OK "刪除檔案成功" null
               | Error (FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
               | Error (UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg

@@ -16,7 +16,7 @@ let createDirectoryHandler (dirName: string) : HttpHandler =
             if trimName.Contains "/" || trimName.Contains ".." then
                 return! responseFactory StatusCodes.Status500InternalServerError "Invalid path" null next ctx
             else
-                let fullPath = Path.Combine(config.ContentRoot, "resource", trimName)
+                let fullPath = Path.Combine(config.ContentRoot, trimName)
 
                 let handler =
                     match trimName, Directory.Exists fullPath with

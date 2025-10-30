@@ -19,7 +19,7 @@ let uploadHandler (dirPath: string) : HttpHandler =
                     | true, 0 ->
                         return! responseFactory StatusCodes.Status400BadRequest "No file uploaded" null next ctx
                     | true, _ ->
-                        let fullPath = Path.Combine(config.ContentRoot, "resource", dirPath)
+                        let fullPath = Path.Combine(config.ContentRoot, dirPath)
 
                         match Directory.Exists fullPath with
                         | false ->

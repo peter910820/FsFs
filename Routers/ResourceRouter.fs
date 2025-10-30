@@ -7,7 +7,7 @@ open FsFs.Infrastructure.Config
 open FsFs.Handlers.StaticFileHandler
 
 let resourceDir () =
-    Path.Combine(config.ContentRoot, "resource")
+    Path.Combine config.ContentRoot
 
 /// <summary>靜態檔案主路由，當config START_MODE是Manual的時候才會註冊</summary>
 let staticFileRoutes () : HttpHandler =
