@@ -40,7 +40,8 @@ let listFile () : HttpHandler =
             let handler =
                 (match ctx.TryGetQueryStringValue "dir" with
                  | Some dir -> safeGetFiles config.ContentRoot dir
-                 | None -> safeGetAllFiles config.ContentRoot)
+                 | None -> safeGetFiles config.ContentRoot "")
+                //  | None -> safeGetAllFiles config.ContentRoot)
                 |> function
                     | Ok files -> responseFactory StatusCodes.Status200OK "獲取fsfs檔案成功" files
                     | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg null
