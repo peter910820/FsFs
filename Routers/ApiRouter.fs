@@ -10,7 +10,8 @@ open FsFs.Handlers.AuthHandler
 open FsFs.Handlers.CreateDirectoryHandler
 open FsFs.Infrastructure.Middleware
 
-let apiRoutes: HttpHandler =
+/// <summary>API主路由</summary>
+let apiRoutes () : HttpHandler =
     choose
         [ GET
           >=> choose [ route "/directories" >=> listFolders (); route "/files" >=> listFile () ]
