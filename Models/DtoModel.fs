@@ -6,6 +6,8 @@ open System
 module Request =
     type LoginRequest = { username: string; password: string }
 
+    type DeleteFileRequest = { fileName: string }
+
 /// <summary>Response DTO的結構定義</summary>
 module Response =
     type ApiResponse<'T> =

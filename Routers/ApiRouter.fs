@@ -21,5 +21,4 @@ let apiRoutes () : HttpHandler =
                     route "/login" >=> loginHandler ()
                     routef "/upload/%s" (fun fileName -> authMiddleware >=> uploadHandler fileName)
                     routef "/create-directory/%s" (fun dirName -> authMiddleware >=> createDirectoryHandler dirName) ]
-          DELETE
-          >=> choose [ routef "file/%s" (fun fileName -> authMiddleware >=> deleteFileHandler fileName) ] ]
+          DELETE >=> choose [ route "/file" >=> authMiddleware >=> deleteFileHandler () ] ]

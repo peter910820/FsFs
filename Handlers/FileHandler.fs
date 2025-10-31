@@ -6,6 +6,7 @@ open Microsoft.AspNetCore.Http
 
 open FsFs.Infrastructure.Config
 open FsFs.Infrastructure.ResponseFactory
+open FsFs.Models.DtoModel
 
 type DeleteFileError =
     | FileNotFound of string
@@ -59,11 +60,13 @@ let safeDeleteFile path : Result<unit, DeleteFileError> =
             Error(UnknownError ex.Message)
 
 /// <summary>刪除檔案Handler</summary>
-let deleteFileHandler (fileName: string) : HttpHandler =
+let deleteFileHandler () : HttpHandler =
     fun next ctx ->
         task {
+            let! req = ctx.BindJsonAsync<Request.DeleteFileRequest>()
+
             let handler =
-                match safeDeleteFile (Path.Combine(config.ContentRoot, fileName)) with
+                match safeDeleteFile (Path.Combine(config.ContentRoot, req.fileName)) with
                 | Ok() -> responseFactory StatusCodes.Status200OK "刪除檔案成功" null
                 | Error(FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
                 | Error(UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
