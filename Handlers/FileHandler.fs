@@ -1,6 +1,5 @@
 module FsFs.Handlers.FileHandler
 
-open System
 open System.IO
 open Giraffe
 open Microsoft.AspNetCore.Http
@@ -40,8 +39,7 @@ let listFile () : HttpHandler =
             let handler =
                 (match ctx.TryGetQueryStringValue "dir" with
                  | Some dir -> safeGetFiles config.ContentRoot dir
-                 | None -> safeGetFiles config.ContentRoot "")
-                //  | None -> safeGetAllFiles config.ContentRoot)
+                 | None -> safeGetAllFiles config.ContentRoot)
                 |> function
                     | Ok files -> responseFactory StatusCodes.Status200OK "獲取fsfs檔案成功" files
                     | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg null
@@ -52,23 +50,23 @@ let listFile () : HttpHandler =
 /// <summary>刪除檔案，有副作用</summary>
 let safeDeleteFile path : Result<unit, DeleteFileError> =
     if not (File.Exists path) then
-        Error (FileNotFound path)
+        Error(FileNotFound path)
     else
         try
             File.Delete path
-            Ok ()
-        with
-        | ex -> Error (UnknownError ex.Message)
+            Ok()
+        with ex ->
+            Error(UnknownError ex.Message)
 
 /// <summary>刪除檔案Handler</summary>
-let deleteFileHandler (fileName: string) : HttpHandler = 
+let deleteFileHandler (fileName: string) : HttpHandler =
     fun next ctx ->
         task {
             let handler =
-              match safeDeleteFile (Path.Combine(config.ContentRoot, fileName)) with
-              | Ok () -> responseFactory StatusCodes.Status200OK "刪除檔案成功" null
-              | Error (FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
-              | Error (UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
+                match safeDeleteFile (Path.Combine(config.ContentRoot, fileName)) with
+                | Ok() -> responseFactory StatusCodes.Status200OK "刪除檔案成功" null
+                | Error(FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
+                | Error(UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
 
             return! handler next ctx
         }
