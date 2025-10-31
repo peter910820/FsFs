@@ -27,11 +27,15 @@ let configureCors (builder: CorsPolicyBuilder) =
 let configureApp (app: IApplicationBuilder) =
     let env = app.ApplicationServices.GetService<IWebHostEnvironment>()
 
-    (match env.IsDevelopment() with
-     | true -> app.UseDeveloperExceptionPage()
-     | false -> app.UseGiraffeErrorHandler(errorHandler).UseHttpsRedirection())
-        .UseCors(configureCors)
-        .UseStaticFiles()
+    let app =
+        if env.IsDevelopment() then
+            app.UseDeveloperExceptionPage()
+        else
+            app.UseGiraffeErrorHandler(errorHandler)
+               .UseHttpsRedirection()
+
+    app.UseCors(configureCors)
+       .UseStaticFiles()
         .UseGiraffe
         webApp
 
