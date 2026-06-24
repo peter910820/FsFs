@@ -41,3 +41,16 @@ WebRoot
 
 # env file
 .env
+
+# Frontend
+Frontend/node_modules/
+Frontend/dist/
+Frontend/dist-ssr/
+Frontend/logs/
+Frontend/.env
+Frontend/.env.production
+Frontend/*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
