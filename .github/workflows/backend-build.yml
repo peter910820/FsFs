@@ -34,7 +34,7 @@ jobs:
             8.x.x
 
       - name: Restore dependencies
-        run: dotnet restore FsFs.fsproj
+        run: dotnet restore Tests/FsFs.Tests.fsproj
 
       - name: Build
         run: dotnet build FsFs.fsproj -c Release --no-restore
