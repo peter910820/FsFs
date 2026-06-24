@@ -1,0 +1,43 @@
+name: Backend Build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.fs'
+      - '**/*.fsproj'
+      - 'Tests/**'
+      - 'web.config'
+      - '.github/workflows/backend-build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.fs'
+      - '**/*.fsproj'
+      - 'Tests/**'
+      - 'web.config'
+      - '.github/workflows/backend-build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x.x
+
+      - name: Restore dependencies
+        run: dotnet restore FsFs.fsproj
+
+      - name: Build
+        run: dotnet build FsFs.fsproj -c Release --no-restore
+
+      - name: Test
+        run: dotnet test Tests/FsFs.Tests.fsproj -c Release --no-restore --verbosity normal
