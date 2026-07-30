@@ -42,8 +42,8 @@ let listFile () : HttpHandler =
                  | Some dir -> safeGetFiles config.ContentRoot dir
                  | None -> safeGetAllFiles config.ContentRoot)
                 |> function
-                    | Ok files -> responseFactory StatusCodes.Status200OK "獲取fsfs檔案成功" files
-                    | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg null
+                    | Ok files -> responseFactory StatusCodes.Status200OK "獲取fsfs檔案成功" (Some files)
+                    | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg None
 
             return! handler next ctx
         }
@@ -67,9 +67,9 @@ let deleteFileHandler () : HttpHandler =
 
             let handler =
                 match safeDeleteFile (Path.Combine(config.ContentRoot, req.fileName)) with
-                | Ok() -> responseFactory StatusCodes.Status200OK "刪除檔案成功" null
-                | Error(FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
-                | Error(UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg msg
+                | Ok() -> responseFactory StatusCodes.Status200OK "刪除檔案成功" None
+                | Error(FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg (Some msg)
+                | Error(UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg (Some msg)
 
             return! handler next ctx
         }

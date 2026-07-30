@@ -15,4 +15,4 @@ let errorHandler (ex: Exception) (logger: ILogger) =
     logger.LogError(ex, ex.Message)
 
     clearResponse
-    >=> responseFactory StatusCodes.Status500InternalServerError "發生內部錯誤，請聯繫管理員" null
+    >=> responseFactory StatusCodes.Status500InternalServerError "發生內部錯誤，請聯繫管理員" None

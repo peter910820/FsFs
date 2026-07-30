@@ -21,7 +21,7 @@ let ``ApiResponse serializes with camelCase property names`` () =
     Assert.Contains(""""data":"hello""", json)
 
 [<Fact>]
-let ``ApiResponse with null data serializes data as null`` () =
+let ``ApiResponse with None data serializes data as null`` () =
     let resp: Response.ApiResponse<string> =
         { StatusCode = 500
           Msg = "error"

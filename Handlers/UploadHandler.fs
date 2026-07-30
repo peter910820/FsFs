@@ -11,13 +11,13 @@ let uploadHandler (dirPath: string) : HttpHandler =
     fun next ctx ->
         task {
             if dirPath.Contains "/" || dirPath.Contains ".." then
-                return! responseFactory StatusCodes.Status500InternalServerError "Invalid path" null next ctx
+                return! responseFactory StatusCodes.Status500InternalServerError "Invalid path" None next ctx
             else
                 try
                     match ctx.Request.HasFormContentType, ctx.Request.Form.Files.Count with
-                    | false, _ -> return! responseFactory StatusCodes.Status400BadRequest "Bad request" null next ctx
+                    | false, _ -> return! responseFactory StatusCodes.Status400BadRequest "Bad request" None next ctx
                     | true, 0 ->
-                        return! responseFactory StatusCodes.Status400BadRequest "No file uploaded" null next ctx
+                        return! responseFactory StatusCodes.Status400BadRequest "No file uploaded" None next ctx
                     | true, _ ->
                         let fullPath = Path.Combine(config.ContentRoot, dirPath)
 
@@ -27,7 +27,7 @@ let uploadHandler (dirPath: string) : HttpHandler =
                                 responseFactory
                                     StatusCodes.Status500InternalServerError
                                     "Upload directory does not exist"
-                                    null
+                                    None
                                     next
                                     ctx
                         | true ->
@@ -38,7 +38,7 @@ let uploadHandler (dirPath: string) : HttpHandler =
                                     responseFactory
                                         StatusCodes.Status500InternalServerError
                                         "Invalid path"
-                                        null
+                                        None
                                         next
                                         ctx
                             else
@@ -50,9 +50,9 @@ let uploadHandler (dirPath: string) : HttpHandler =
                                     responseFactory
                                         StatusCodes.Status200OK
                                         $"File {file.FileName} upload success"
-                                        null
+                                        None
                                         next
                                         ctx
                 with _ as ex ->
-                    return! responseFactory StatusCodes.Status500InternalServerError ex.Message null next ctx
+                    return! responseFactory StatusCodes.Status500InternalServerError ex.Message None next ctx
         }

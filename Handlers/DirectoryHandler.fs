@@ -21,8 +21,8 @@ let listFolders () : HttpHandler =
             let handler =
                 safeGetDirectories config.ContentRoot
                 |> function
-                    | Ok folders -> responseFactory StatusCodes.Status200OK "獲取fsfs資料夾成功" folders
-                    | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg null
+                    | Ok folders -> responseFactory StatusCodes.Status200OK "獲取fsfs資料夾成功" (Some folders)
+                    | Error msg -> responseFactory StatusCodes.Status500InternalServerError msg None
 
             return! handler next ctx
         }

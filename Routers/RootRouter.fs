@@ -14,4 +14,4 @@ let webApp: HttpHandler =
         [ if config.StartMode = "Manual" then
               subRoute "/resource" (staticFileRoutes ())
           subRoute "/api" (apiRoutes ())
-          RequestErrors.notFound (responseFactory 404 "not found" null) ]
+          RequestErrors.notFound (responseFactory 404 "not found" None) ]

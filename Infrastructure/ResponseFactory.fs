@@ -18,10 +18,10 @@ let jsonCamelCase<'T> (data: 'T) : HttpHandler =
             return Some ctx
         }
 
-let responseFactory<'T when 'T: not struct and 'T: null> (statusCode: int) (msg: string) (data: 'T) : HttpHandler =
+let responseFactory (statusCode: int) (msg: string) (data: 'T option) : HttpHandler =
     let resp: Response.ApiResponse<'T> =
         { StatusCode = statusCode
           Msg = msg
-          Data = Option.ofObj data }
+          Data = data }
 
     setStatusCode statusCode >=> jsonCamelCase resp

@@ -14,6 +14,6 @@ let authMiddleware: HttpHandler =
             | true, sessionId ->
                 match cache.TryGetValue<int> sessionId with
                 | true, _ -> return! next ctx
-                | false, _ -> return! responseFactory StatusCodes.Status401Unauthorized "階段性認證已過期" null next ctx
-            | false, _ -> return! responseFactory StatusCodes.Status401Unauthorized "使用者未登入" null next ctx
+                | false, _ -> return! responseFactory StatusCodes.Status401Unauthorized "階段性認證已過期" None next ctx
+            | false, _ -> return! responseFactory StatusCodes.Status401Unauthorized "使用者未登入" None next ctx
         }
