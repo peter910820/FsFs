@@ -2,72 +2,147 @@
 
 以 F# 與 [Giraffe](https://github.com/giraffe-fsharp/Giraffe) 打造的個人檔案伺服器，搭配 Vue 3 前端，提供檔案瀏覽、上傳與管理功能。
 
+後端與前端為分離式架構；部署時前端與靜態資源通常由 Nginx 代理，後端只負責 API。
+
 ## 功能
 
 - 瀏覽資料夾與檔案列表
-- 登入驗證後上傳檔案、建立資料夾、刪除檔案
-- 靜態檔案服務（支援 Nginx 代理或內建模式）
-- Markdown 預覽與語法高亮
+- 登入後上傳檔案、建立資料夾、刪除檔案
+- 靜態檔案服務（Nginx 代理或內建 `Manual` 模式）
+- Markdown 預覽與語法高亮（前端）
 
 ## 技術棧
 
-| 層級 | 技術 |
-|------|------|
-| 後端 | F#、Giraffe、ASP.NET Core 8、Entity Framework Core |
-| 資料庫 | PostgreSQL |
-| 前端 | Vue 3、TypeScript、Vite、Pinia、Materialize CSS |
+
+| 層級  | 技術                                              |
+| --- | ----------------------------------------------- |
+| 後端  | F#、Giraffe、ASP.NET Core 8、Entity Framework Core |
+| 資料庫 | PostgreSQL                                      |
+| 認證  | Cookie `sid` + MemoryCache session（BCrypt 驗證密碼） |
+| 前端  | Vue 3、TypeScript、Vite、Pinia、Materialize CSS     |
+
 
 ## 專案結構
 
 ```
 FsFs/
 ├── Handlers/          # API 處理邏輯
-├── Infrastructure/    # 設定、資料庫、中介層
-├── Models/            # 資料模型
+├── Infrastructure/    # 設定、資料庫、中介層、回應工廠
+├── Models/            # DB / DTO 模型
 ├── Routers/           # 路由定義
 ├── Tests/             # 單元測試
-└── Frontend/          # Vue 前端（獨立專案）
+├── Frontend/          # Vue 前端（獨立專案）
+├── Program.fs         # 應用程式入口
+└── .env.example       # 後端環境變數範本
 ```
 
-後端與前端為分離式架構，部署時前端通常由 Nginx 代理至後端 API。
 
-## 快速開始
 
-### 環境需求
+## 環境需求
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/)（建議搭配 Yarn）
-- PostgreSQL
+- PostgreSQL（需有 `users` 資料表）
+
+
+
+## 快速開始
+
+
 
 ### 後端
 
-1. 複製環境設定並填入資料：
-
-   ```bash
+1. 複製並填寫環境變數：
+  ```bash
    cp .env.example .env
-   ```
-
-2. 啟動後端：
-
-   ```bash
+  ```
+2. 啟動：
+  ```bash
    dotnet run
-   ```
+  ```
+
+啟動時會檢查資料庫連線。
 
 ### 前端
 
-1. 進入前端目錄並安裝依賴：
+```bash
+cd Frontend
+cp .env.example .env
+yarn install
+yarn dev
+```
 
-   ```bash
-   cd Frontend
-   cp .env.example .env
-   yarn install
-   ```
 
-2. 啟動開發伺服器：
 
-   ```bash
-   yarn dev
-   ```
+## 環境變數
+
+
+
+### 後端（`.env`）
+
+
+| 變數                                                    | 說明                                           |
+| ----------------------------------------------------- | -------------------------------------------- |
+| `DB_HOST` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` | PostgreSQL 連線                                |
+| `DB_MAX_POOL_SIZE`                                    | 連線池上限                                        |
+| `RUNTIME_PORT`                                        | 監聽位址，例如 `http://localhost:5000`              |
+| `DOMAIN`                                              | Cookie Domain                                |
+| `ALLOW_CORS`                                          | 允許的 CORS Origin                              |
+| `CONTENT_ROOT`                                        | 檔案根目錄（實際存放上傳／列表的路徑）                          |
+| `START_MODE`                                          | `NGINX`：靜態檔由外部代理；`Manual`：後端掛載 `/resource/*` |
+
+
+
+
+### 前端（`Frontend/.env`）
+
+
+| 變數                        | 說明                                   |
+| ------------------------- | ------------------------------------ |
+| `VITE_API_DOMAIN`         | 後端 API 基底 URL                        |
+| `VITE_STATIC_FILE_DOMAIN` | 靜態檔案基底 URL                           |
+| `VITE_OG_*`               | 生產環境 Open Graph 相關（見 `.env.example`） |
+
+
+
+
+## API 概要
+
+所有 API 前綴為 `/api`。需登入的端點會檢查 Cookie `sid`。
+
+
+| 方法       | 路徑                             | 認證  | 說明                         |
+| -------- | ------------------------------ | --- | -------------------------- |
+| `GET`    | `/api/directories`             | 否   | 列出資料夾                      |
+| `GET`    | `/api/files`                   | 否   | 列出檔案；可選 `?dir=`            |
+| `POST`   | `/api/login`                   | 否   | 登入，設定 `sid`                |
+| `POST`   | `/api/auth`                    | 是   | 驗證 session 是否有效            |
+| `POST`   | `/api/upload/{dir}`            | 是   | 上傳檔案到指定目錄                  |
+| `POST`   | `/api/create-directory/{name}` | 是   | 建立資料夾                      |
+| `DELETE` | `/api/file`                    | 是   | 刪除檔案（JSON body：`fileName`） |
+
+
+當 `START_MODE=Manual` 時，另提供 `/resource/{code\|image\|technology\|test\|test2}/...` 靜態檔路由。
+
+回應格式大致為：
+
+```json
+{
+  "statusCode": 200,
+  "msg": "...",
+  "data": {}
+}
+```
+
+`data` 無內容時為 `null`。
+
+## 測試
+
+```bash
+dotnet test Tests/FsFs.Tests.fsproj
+```
+
+
 
 ## 授權
 
