@@ -15,7 +15,7 @@ let private safeGetDirectories (rootDir: string) : Result<string[], string> =
     with ex ->
         Error ex.Message
 
-let listFolders () : HttpHandler =
+let listFolders : HttpHandler =
     fun next ctx ->
         task {
             let handler =

@@ -34,7 +34,7 @@ let private safeGetAllFiles (rootDir: string) : Result<string[], string> =
     with ex ->
         Error ex.Message
 
-let listFile () : HttpHandler =
+let listFile : HttpHandler =
     fun next ctx ->
         task {
             let handler =
@@ -60,7 +60,7 @@ let safeDeleteFile path : Result<unit, DeleteFileError> =
             Error(UnknownError ex.Message)
 
 /// <summary>刪除檔案Handler</summary>
-let deleteFileHandler () : HttpHandler =
+let deleteFileHandler : HttpHandler =
     fun next ctx ->
         task {
             let! req = ctx.BindJsonAsync<Request.DeleteFileRequest>()

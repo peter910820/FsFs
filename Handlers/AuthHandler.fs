@@ -5,5 +5,5 @@ open Microsoft.AspNetCore.Http
 
 open FsFs.Infrastructure.ResponseFactory
 
-let authHandler () : HttpHandler =
+let authHandler : HttpHandler =
     fun next ctx -> task { return! Successful.ok (responseFactory StatusCodes.Status200OK "登入驗證成功" None) next ctx }

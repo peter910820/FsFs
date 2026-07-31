@@ -13,7 +13,7 @@ open FsFs.Infrastructure.Database
 open FsFs.Models.DtoModel
 open FsFs.Infrastructure.ResponseFactory
 
-let loginHandler () : HttpHandler =
+let loginHandler : HttpHandler =
     fun next ctx ->
         task {
             let! loginData = ctx.BindJsonAsync<Request.LoginRequest>()
