@@ -37,6 +37,14 @@ let loginHandler : HttpHandler =
                     )
                 )
 
-                return! responseFactory StatusCodes.Status200OK "登入成功" (Some loginData.username) next ctx
+                let loginResponse: Response.LoginResponse =
+                    { Username = user.Username
+                      Email = user.Email
+                      Avatar = user.Avatar
+                      Exp = user.Exp
+                      Management = user.Management
+                      CreatedAt = user.CreatedAt }
+
+                return! responseFactory StatusCodes.Status200OK "登入成功" (Some loginResponse) next ctx
             | _ -> return! responseFactory StatusCodes.Status401Unauthorized "登入失敗" None next ctx
         }

@@ -1,12 +1,8 @@
-export interface UserInfo {
-  id: number;
+export interface LoginResponse {
   username: string;
   email: string;
+  avatar: string;
   exp: number;
   management: boolean;
-  created_at: Date;
-  updated_at: Date;
-  update_name: string;
-  avatar: string;
-  dataVersion: number;
+  createdAt: string;
 }

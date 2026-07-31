@@ -16,8 +16,7 @@ module Response =
           Data: 'T option }
 
     type LoginResponse =
-        { Token: string
-          Username: string
+        { Username: string
           Email: string
           Avatar: string
           Exp: int

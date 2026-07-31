@@ -43,9 +43,14 @@ import axios from "axios";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+import { useLoginStore } from "@/store/login";
+import { useUserStore } from "@/store/user";
 import type { ResponseType } from "@/types/response";
+import type { LoginResponse } from "@/types/user";
 
 const router = useRouter();
+const loginStore = useLoginStore();
+const userStore = useUserStore();
 const form = ref({
   username: "",
   password: "",
@@ -54,11 +59,14 @@ const form = ref({
 const handleSubmit = async () => {
   try {
     const apiUrl = import.meta.env.VITE_API_DOMAIN ? `${import.meta.env.VITE_API_DOMAIN}/api/login` : "/api/login";
-    const response = await axios.post<ResponseType<string>>(apiUrl, form.value, {
+    const response = await axios.post<ResponseType<LoginResponse>>(apiUrl, form.value, {
       withCredentials: true,
     });
     sessionStorage.setItem("errorMsg", response.data.msg);
-    // userStore.set(response.data.data);
+    if (response.data.data) {
+      userStore.set(response.data.data);
+      loginStore.set(true);
+    }
     router.push("/");
   } catch (error) {
     if (axios.isAxiosError(error)) {
