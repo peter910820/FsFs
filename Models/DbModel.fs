@@ -8,41 +8,43 @@ open System.ComponentModel.DataAnnotations.Schema
 // DB Models
 // ---------------------------------
 
+[<CLIMutable>]
 [<Table("users")>]
-type User() =
-    [<Column("id")>]
-    member val Id: int = 0 with get, set
+type User =
+    { [<Column("id")>]
+      Id: int
 
-    [<Column("username")>]
-    [<Required>]
-    member val Username: string = "" with get, set
+      [<Column("username")>]
+      [<Required>]
+      Username: string
 
-    [<Column("password")>]
-    [<Required>]
-    member val Password: string = "" with get, set
+      [<Column("password")>]
+      [<Required>]
+      Password: string
 
-    [<Column("email")>]
-    [<Required>]
-    member val Email: string = "" with get, set
+      [<Column("email")>]
+      [<Required>]
+      Email: string
 
-    [<Column("avatar")>]
-    member val Avatar: string = "" with get, set
+      [<Column("avatar")>]
+      Avatar: string
 
-    [<Column("exp")>]
-    member val Exp: int = 0 with get, set
+      [<Column("exp")>]
+      Exp: int
 
-    [<Column("management")>]
-    member val Management: bool = false with get, set
+      [<Column("management")>]
+      Management: bool
 
-    [<Column("created_at")>]
-    member val CreatedAt: DateTime = DateTime.MinValue with get, set
+      [<Column("created_at")>]
+      CreatedAt: DateTime
 
-    [<Column("create_name")>]
-    [<Required>]
-    member val CreateName: string = "" with get, set
+      [<Column("create_name")>]
+      [<Required>]
+      CreateName: string
 
-    [<Column("updated_at")>]
-    member val UpdatedAt: DateTime = DateTime.MinValue with get, set
+      [<Column("updated_at")>]
+      UpdatedAt: DateTime
 
-    [<Column("update_name")>]
-    member val UpdateName: string = "" with get, set
+      [<Column("update_name")>]
+      [<Required>]
+      UpdateName: string }

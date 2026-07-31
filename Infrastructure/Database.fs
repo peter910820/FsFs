@@ -1,11 +1,9 @@
 module FsFs.Infrastructure.Database
 
-open Microsoft.EntityFrameworkCore
 open System
-open Microsoft.Extensions.DependencyInjection
-open Microsoft.EntityFrameworkCore
 open System.Linq
-
+open Microsoft.EntityFrameworkCore
+open Microsoft.Extensions.DependencyInjection
 
 open FsFs.Models.DbModel
 
@@ -13,7 +11,7 @@ type AppDbContext(options: DbContextOptions<AppDbContext>) =
     inherit DbContext(options)
 
     [<DefaultValue>]
-    val mutable users: DbSet<User>
+    val mutable private users: DbSet<User>
 
     member this.Users
         with get () = this.users
