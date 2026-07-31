@@ -2,10 +2,8 @@ module FsFs.Handlers.LoginHandler
 
 open System
 open BCrypt.Net
-open System.Linq
 open Giraffe
 open Microsoft.AspNetCore.Http
-open Microsoft.EntityFrameworkCore
 open Microsoft.Extensions.Caching.Memory
 
 open FsFs.Infrastructure.Config
@@ -18,12 +16,9 @@ let loginHandler : HttpHandler =
         task {
             let! loginData = ctx.BindJsonAsync<Request.LoginRequest>()
             let db = ctx.GetService<AppDbContext>()
+            let! userOpt = tryFindUserByUpdateName db loginData.username
 
-            let! user =
-                db.Users.Where(fun u -> u.UpdateName = loginData.username).FirstOrDefaultAsync()
-                |> Async.AwaitTask
-
-            match Option.ofObj user with
+            match userOpt with
             | Some user when BCrypt.Verify(loginData.password, user.Password) ->
                 // * 設置Session(Cache)
                 let sessionId = Guid.NewGuid().ToString "N"

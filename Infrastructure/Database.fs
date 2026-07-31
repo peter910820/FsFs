@@ -17,6 +17,16 @@ type AppDbContext(options: DbContextOptions<AppDbContext>) =
         with get () = this.users
         and set v = this.users <- v
 
+let tryFindUserByUpdateName (db: AppDbContext) (username: string) =
+    task {
+        let! user =
+            db.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(fun u -> u.UpdateName = username)
+
+        return Option.ofObj user
+    }
+
 let checkDbConnection (services: IServiceProvider) : Async<Result<unit, string>> =
     async {
         try
