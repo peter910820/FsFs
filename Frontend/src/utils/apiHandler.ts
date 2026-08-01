@@ -1,31 +1,63 @@
 import axios from "axios";
-// type
 import type { AxiosResponse } from "axios";
+
+import type { ResponseType } from "@/types/response";
+import type { LoginResponse } from "@/types/user";
+
+export const apiUrl = (path: string) => {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  const base = import.meta.env.VITE_API_DOMAIN || "";
+  return `${base}/api${normalized}`;
+};
+
+export const getErrorMessage = (error: unknown, fallback: string) => {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data?.msg || error.message || fallback;
+  }
+  if (error instanceof Error) {
+    return error.message || fallback;
+  }
+  return fallback;
+};
 
 export const getDirectory = async (): Promise<AxiosResponse> => {
   try {
-    let url = "/api/directories";
-    if (import.meta.env.VITE_API_DOMAIN) {
-      url = import.meta.env.VITE_API_DOMAIN + "/api/directories";
-    }
-    const response = await axios.get(url);
-    return response;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    return error.response;
+    return await axios.get(apiUrl("/directories"));
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) return error.response as AxiosResponse;
+    throw error;
   }
 };
 
-export const getFile = async (): Promise<AxiosResponse> => {
-  let url = "/api/files";
-  if (import.meta.env.VITE_API_DOMAIN) {
-    url = import.meta.env.VITE_API_DOMAIN + "/api/files";
-  }
+export const getFile = async (dir?: string): Promise<AxiosResponse> => {
+  const url = dir ? apiUrl(`/files?dir=${encodeURIComponent(dir)}`) : apiUrl("/files");
   try {
-    const response = await axios.get(url);
-    return response;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    return error.response;
+    return await axios.get(url);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) return error.response as AxiosResponse;
+    throw error;
   }
+};
+
+export const deleteFile = async (fileName: string) => {
+  return axios.delete<ResponseType<string[]>>(apiUrl("/file"), {
+    data: { fileName },
+    headers: { "Content-Type": "application/json" },
+    withCredentials: true,
+  });
+};
+
+export const uploadFile = async (directory: string, formData: FormData) => {
+  return axios.post(apiUrl(`/upload/${directory}`), formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    withCredentials: true,
+  });
+};
+
+export const login = async (username: string, password: string) => {
+  return axios.post<ResponseType<LoginResponse>>(apiUrl("/login"), { username, password }, { withCredentials: true });
+};
+
+export const authCheck = async () => {
+  return axios.post<ResponseType<null>>(apiUrl("/auth"), {}, { withCredentials: true });
 };

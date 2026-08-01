@@ -3,24 +3,11 @@ import { onMounted, ref } from "vue";
 
 import BlockError from "@/components/BlockError.vue";
 import { getFile } from "@/utils/apiHandler";
+import { fileIcon, openStaticFile } from "@/utils/files";
 
 const files = ref<string[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
-
-const fileIcon = (name: string) => {
-  const lower = name.toLowerCase();
-  if ([".png", ".jpg", ".jpeg", ".gif", ".webp"].some((ext) => lower.endsWith(ext))) return "mdi-image-outline";
-  if ([".zip", ".rar", ".7z", ".tar.gz"].some((ext) => lower.endsWith(ext))) return "mdi-folder-zip-outline";
-  if ([".go", ".py", ".fs", ".cs", ".ts", ".js"].some((ext) => lower.endsWith(ext))) return "mdi-code-braces";
-  if ([".mp4", ".mkv", ".webm"].some((ext) => lower.endsWith(ext))) return "mdi-video-outline";
-  if ([".mp3", ".wav", ".flac"].some((ext) => lower.endsWith(ext))) return "mdi-music-note";
-  return "mdi-file-outline";
-};
-
-const openFile = (path: string) => {
-  window.location.href = `${import.meta.env.VITE_STATIC_FILE_DOMAIN}/${path}`;
-};
 
 const loadFiles = async () => {
   loading.value = true;
@@ -68,7 +55,7 @@ onMounted(loadFiles);
             :title="item"
             rounded="lg"
             class="mx-2"
-            @click="openFile(item)"
+            @click="openStaticFile(item)"
           >
             <template #append>
               <v-icon icon="mdi-open-in-new" size="small" class="text-medium-emphasis" />

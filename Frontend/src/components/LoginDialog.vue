@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import axios from "axios";
 import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import { authStore } from "@/store/auth";
-import type { ResponseType } from "@/types/response";
-import type { LoginResponse } from "@/types/user";
+import { getErrorMessage, login } from "@/utils/apiHandler";
 
 const open = defineModel<boolean>({ default: false });
 
@@ -35,10 +33,7 @@ const handleSubmit = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const apiUrl = import.meta.env.VITE_API_DOMAIN ? `${import.meta.env.VITE_API_DOMAIN}/api/login` : "/api/login";
-    const response = await axios.post<ResponseType<LoginResponse>>(apiUrl, form.value, {
-      withCredentials: true,
-    });
+    const response = await login(form.value.username, form.value.password);
     if (response.data.data) {
       authStore.login(response.data.data);
       close();
@@ -47,11 +42,7 @@ const handleSubmit = async () => {
       error.value = response.data.msg || "登入失敗";
     }
   } catch (err) {
-    if (axios.isAxiosError(err)) {
-      error.value = err.response?.data?.msg || err.message || "登入失敗";
-    } else {
-      error.value = "登入失敗";
-    }
+    error.value = getErrorMessage(err, "登入失敗");
   } finally {
     loading.value = false;
   }

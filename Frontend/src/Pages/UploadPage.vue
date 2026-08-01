@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import axios from "axios";
 import { onMounted, ref } from "vue";
 
 import BlockError from "@/components/BlockError.vue";
-import { getDirectory } from "@/utils/apiHandler";
+import { toastStore } from "@/store/toast";
+import { getDirectory, getErrorMessage, uploadFile } from "@/utils/apiHandler";
 
 const directories = ref<string[]>([]);
 const selectedDirectory = ref<string | null>(null);
@@ -12,15 +12,6 @@ const fileName = ref("");
 const loading = ref(false);
 const loadingDirs = ref(true);
 const errorDirs = ref<string | null>(null);
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("success");
-
-const showMessage = (text: string, color = "success") => {
-  snackbarText.value = text;
-  snackbarColor.value = color;
-  snackbar.value = true;
-};
 
 const loadDirectories = async () => {
   loadingDirs.value = true;
@@ -49,22 +40,22 @@ const isValidLinuxFileName = (name: string) => {
 const upload = async () => {
   const selectedFile = file.value[0];
   if (!selectedFile) {
-    showMessage("請選擇檔案", "warning");
+    toastStore.show("請選擇檔案", "warning");
     return;
   }
   if (!selectedDirectory.value) {
-    showMessage("請選擇上傳資料夾", "warning");
+    toastStore.show("請選擇上傳資料夾", "warning");
     return;
   }
   if ([".js", ".exe", ".dll", ".sh"].some((ext) => selectedFile.name.toLowerCase().endsWith(ext))) {
-    showMessage("不允許該檔案上傳", "error");
+    toastStore.show("不允許該檔案上傳", "error");
     return;
   }
 
   const formData = new FormData();
   if (fileName.value.trim() !== "") {
     if (!isValidLinuxFileName(fileName.value.trim())) {
-      showMessage("檔名有非法字元，請修改檔名", "error");
+      toastStore.show("檔名有非法字元，請修改檔名", "error");
       return;
     }
     const extension = selectedFile.name.includes(".")
@@ -78,22 +69,12 @@ const upload = async () => {
 
   loading.value = true;
   try {
-    const apiBase = import.meta.env.VITE_API_DOMAIN || "";
-    await axios.post(`${apiBase}/api/upload/${selectedDirectory.value}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      withCredentials: true,
-    });
-    showMessage("檔案上傳成功！");
+    await uploadFile(selectedDirectory.value, formData);
+    toastStore.show("檔案上傳成功！", "success");
     file.value = [];
     fileName.value = "";
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      showMessage(error.response?.data?.msg || error.message, "error");
-    } else if (error instanceof Error) {
-      showMessage(`例外錯誤 ${error.message}`, "error");
-    } else {
-      showMessage("上傳失敗", "error");
-    }
+    toastStore.show(getErrorMessage(error, "上傳失敗"), "error");
   } finally {
     loading.value = false;
   }
@@ -173,10 +154,6 @@ const upload = async () => {
       </v-card>
     </v-col>
   </v-row>
-
-  <v-snackbar v-model="snackbar" :color="snackbarColor" rounded="pill" timeout="3000">
-    {{ snackbarText }}
-  </v-snackbar>
 </template>
 
 <style scoped>

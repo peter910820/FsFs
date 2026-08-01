@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import axios from "axios";
-import type { ResponseType } from "@/types/response";
 
 import BlockError from "@/components/BlockError.vue";
-import { getDirectory, getFile } from "@/utils/apiHandler";
 import { authStore } from "@/store/auth";
+import { toastStore } from "@/store/toast";
+import { deleteFile, getDirectory, getErrorMessage, getFile } from "@/utils/apiHandler";
+import { fileIcon, openStaticFile } from "@/utils/files";
 
 const { status } = authStore;
 
@@ -21,40 +21,7 @@ const deleteDialog = ref(false);
 const pendingDelete = ref<string | null>(null);
 const deleting = ref(false);
 
-const snackbar = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("error");
-
 const currentLabel = computed(() => (selectedDir.value ? selectedDir.value : "全部檔案"));
-
-const apiBase = () => import.meta.env.VITE_API_DOMAIN || "";
-
-const errorMessage = (error: unknown, fallback: string) => {
-  if (axios.isAxiosError(error)) {
-    return error.response?.data?.msg || error.message || fallback;
-  }
-  if (error instanceof Error) {
-    return error.message || fallback;
-  }
-  return fallback;
-};
-
-const showSnackbar = (text: string, color = "error") => {
-  snackbarText.value = text;
-  snackbarColor.value = color;
-  snackbar.value = true;
-};
-
-const fileIcon = (name: string) => {
-  const lower = name.toLowerCase();
-  if ([".png", ".jpg", ".jpeg", ".gif", ".webp"].some((ext) => lower.endsWith(ext))) return "mdi-image-outline";
-  if ([".zip", ".rar", ".7z", ".tar.gz"].some((ext) => lower.endsWith(ext))) return "mdi-folder-zip-outline";
-  if ([".go", ".py", ".fs", ".cs", ".ts", ".js"].some((ext) => lower.endsWith(ext))) return "mdi-code-braces";
-  if ([".mp4", ".mkv", ".webm"].some((ext) => lower.endsWith(ext))) return "mdi-video-outline";
-  if ([".mp3", ".wav", ".flac"].some((ext) => lower.endsWith(ext))) return "mdi-music-note";
-  if (lower.endsWith(".xp3")) return "mdi-cog-outline";
-  return "mdi-file-outline";
-};
 
 const loadDirectories = async () => {
   loadingDirs.value = true;
@@ -88,18 +55,19 @@ const expandDetails = async (folder: string) => {
   errorFiles.value = null;
   selectedDir.value = folder;
   try {
-    const response = await axios.get<ResponseType<string[]>>(`${apiBase()}/api/files?dir=${folder}`);
-    files.value = response.data.data ?? [];
+    const response = await getFile(folder);
+    if (response && response.status === 200) {
+      files.value = response.data.data ?? [];
+    } else {
+      files.value = [];
+      errorFiles.value = response?.data?.msg ?? "無法取得檔案列表";
+    }
   } catch (error) {
     files.value = [];
-    errorFiles.value = errorMessage(error, "無法取得檔案列表");
+    errorFiles.value = getErrorMessage(error, "無法取得檔案列表");
   } finally {
     loadingFiles.value = false;
   }
-};
-
-const openFile = (path: string) => {
-  window.location.href = `${import.meta.env.VITE_STATIC_FILE_DOMAIN}/${path}`;
 };
 
 const askDelete = (path: string) => {
@@ -111,11 +79,7 @@ const confirmDelete = async () => {
   if (!pendingDelete.value) return;
   deleting.value = true;
   try {
-    await axios.delete<ResponseType<string[]>>(`${apiBase()}/api/file`, {
-      data: { fileName: pendingDelete.value },
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    });
+    await deleteFile(pendingDelete.value);
     deleteDialog.value = false;
     pendingDelete.value = null;
     if (selectedDir.value) {
@@ -125,7 +89,7 @@ const confirmDelete = async () => {
     }
   } catch (error) {
     deleteDialog.value = false;
-    showSnackbar(errorMessage(error, "刪除失敗"));
+    toastStore.show(getErrorMessage(error, "刪除失敗"), "error");
   } finally {
     deleting.value = false;
   }
@@ -144,7 +108,6 @@ onMounted(async () => {
     </div>
 
     <v-row>
-      <!-- 手機：橫向資料夾 chip -->
       <v-col cols="12" class="d-md-none pb-0">
         <BlockError v-if="errorDirs && !loadingDirs" :message="errorDirs" @retry="loadDirectories" />
         <div v-else class="folder-chips d-flex ga-2 pb-2">
@@ -169,7 +132,6 @@ onMounted(async () => {
         </div>
       </v-col>
 
-      <!-- 桌面：左欄資料夾 -->
       <v-col cols="12" md="3" class="d-none d-md-block">
         <v-card class="folder-panel" rounded="xl" elevation="2">
           <v-skeleton-loader v-if="loadingDirs" type="list-item@4" />
@@ -198,7 +160,6 @@ onMounted(async () => {
         </v-card>
       </v-col>
 
-      <!-- 右欄檔案 -->
       <v-col cols="12" md="9">
         <v-card rounded="xl" elevation="2">
           <v-skeleton-loader v-if="loadingFiles" type="list-item-avatar@6" />
@@ -215,7 +176,7 @@ onMounted(async () => {
               :title="item"
               rounded="lg"
               class="mx-2"
-              @click="openFile(item)"
+              @click="openStaticFile(item)"
             >
               <template #append>
                 <v-btn
@@ -254,10 +215,6 @@ onMounted(async () => {
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-snackbar v-model="snackbar" :color="snackbarColor" rounded="pill" timeout="3000">
-      {{ snackbarText }}
-    </v-snackbar>
   </div>
 </template>
 

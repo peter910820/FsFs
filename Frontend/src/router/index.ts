@@ -1,14 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
-import type { RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw, RouteLocationNormalized, NavigationGuardNext } from "vue-router";
+import axios from "axios";
 
 import { authStore } from "@/store/auth";
 import { toastStore } from "@/store/toast";
-
-import axios from "axios";
-
-import type { ResponseType } from "@/types/response";
-
-import type { RouteLocationNormalized, NavigationGuardNext } from "vue-router";
+import { authCheck } from "@/utils/apiHandler";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -27,7 +23,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/Pages/UploadPage.vue"),
     beforeEnter: async (to, from, next) => middlware(to, from, next),
   },
-  // match all route
   {
     path: "/:pathMatch(.*)*",
     name: "notFound",
@@ -38,15 +33,8 @@ const routes: Array<RouteRecordRaw> = [
 
 const middlware = async (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
   try {
-    const apiUrl = import.meta.env.VITE_API_DOMAIN ? `${import.meta.env.VITE_API_DOMAIN}/api/auth` : "/api/auth";
-    const response = await axios.post<ResponseType<null>>(
-      apiUrl,
-      {},
-      {
-        withCredentials: true,
-      },
-    );
-    sessionStorage.setItem("msg", response.data.msg); // ?
+    const response = await authCheck();
+    sessionStorage.setItem("msg", response.data.msg);
     authStore.setStatus(true);
     next();
   } catch (error) {
