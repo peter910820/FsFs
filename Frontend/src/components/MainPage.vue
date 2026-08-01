@@ -63,6 +63,7 @@ const upload = async () => {
   try {
     await axios.post(import.meta.env.VITE_API_DOMAIN + "/api/upload/" + updateDirectory.value, formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      withCredentials: true,
     });
     alert("檔案上傳成功！");
   } catch (error: any) {
