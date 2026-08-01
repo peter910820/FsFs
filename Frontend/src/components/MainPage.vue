@@ -1,143 +1,88 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { initMaterialFormSelect } from "@/composables/useMaterial";
-import axios from "axios";
 
-import { getDirectory } from "@/utils/apiHandler";
+import { getFile } from "@/utils/apiHandler";
 
 const router = useRouter();
-const directory = ref(null);
-const updateDirectory = ref<string | null>(null);
-const file = ref<File | null>(null);
-const fileName = ref<string>("");
+const files = ref<string[]>([]);
+const loading = ref(true);
+
+const fileIcon = (name: string) => {
+  const lower = name.toLowerCase();
+  if ([".png", ".jpg", ".jpeg", ".gif", ".webp"].some((ext) => lower.endsWith(ext))) return "mdi-image-outline";
+  if ([".zip", ".rar", ".7z", ".tar.gz"].some((ext) => lower.endsWith(ext))) return "mdi-folder-zip-outline";
+  if ([".go", ".py", ".fs", ".cs", ".ts", ".js"].some((ext) => lower.endsWith(ext))) return "mdi-code-braces";
+  if ([".mp4", ".mkv", ".webm"].some((ext) => lower.endsWith(ext))) return "mdi-video-outline";
+  if ([".mp3", ".wav", ".flac"].some((ext) => lower.endsWith(ext))) return "mdi-music-note";
+  return "mdi-file-outline";
+};
+
+const openFile = (path: string) => {
+  window.location.href = `${import.meta.env.VITE_STATIC_FILE_DOMAIN}/${path}`;
+};
 
 onMounted(async () => {
-  const response = await getDirectory();
+  const response = await getFile();
   if (response && response.status === 200) {
-    directory.value = response.data.data;
+    files.value = response.data.data ?? [];
   } else {
+    sessionStorage.setItem("errorMsg", response?.data?.msg ?? "無法取得檔案列表");
     router.push("/error");
   }
-  initMaterialFormSelect();
+  loading.value = false;
 });
-
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (target.files && target.files.length > 0) {
-    file.value = target.files[0];
-  }
-};
-
-const upload = async () => {
-  if (!file.value) {
-    alert("請選擇檔案");
-    return;
-  }
-  if (!updateDirectory.value) {
-    alert("請選擇上傳資料夾");
-    return;
-  }
-
-  if ([".js", ".exe", ".dll", ".sh"].some((ext) => (file.value?.name ?? "").toLowerCase().endsWith(ext))) {
-    alert("不允許該檔案上傳");
-    return;
-  }
-
-  // 包裝成FormData
-  const formData = new FormData();
-  if (fileName.value.trim() !== "") {
-    if (!isValidLinuxFileName(fileName.value.trim())) {
-      alert("檔名有非法字元，請修改檔名");
-      return;
-    }
-    // 取得原檔副檔名
-    const originalName = file.value.name;
-    const extension = originalName.includes(".") ? originalName.slice(originalName.lastIndexOf(".")) : "";
-    formData.append("file", new File([file.value], fileName.value.trim() + extension, { type: file.value.type }));
-  } else {
-    formData.append("file", file.value);
-  }
-  formData.append("directory", updateDirectory.value as string);
-
-  try {
-    await axios.post(import.meta.env.VITE_API_DOMAIN + "/api/upload/" + updateDirectory.value, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      withCredentials: true,
-    });
-    alert("檔案上傳成功！");
-  } catch (error: any) {
-    if (axios.isAxiosError(error)) {
-      sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
-    } else {
-      sessionStorage.setItem("errorMsg", `例外錯誤 ${error.message}`);
-    }
-    router.push("/error");
-  }
-};
-
-const isValidLinuxFileName = (name: string) => {
-  // 空字串、null、undefined 都視為非法
-  if (!name || name.trim() === "") return false;
-
-  // 禁止 / 與 null 字元
-  if (name.includes("/") || name.includes("\0")) return false;
-
-  // 避免特殊字元（可選）
-  const illegalPattern = /[*?"<>|]/;
-  if (illegalPattern.test(name)) return false;
-
-  // 避免 . 與 ..
-  if (name === "." || name === "..") return false;
-
-  // 長度檢查
-  if (name.length > 255) return false;
-
-  return true;
-};
 </script>
 
 <template>
-  <div class="row main-block">
-    <div class="col s12">
-      <h1>資源伺服器目錄</h1>
-    </div>
-    <div class="col s12 file-field input-field">
-      <div class="col s1 button-common flex-btn">
-        <span><i class="material-icons">upload_file</i></span>
-        <input type="file" name="file" @change="handleFileUpload" />
+  <v-row justify="center">
+    <v-col cols="12" md="10" lg="8">
+      <div class="home-hero pa-8 mb-6 rounded-xl">
+        <div class="text-h4 font-weight-bold mb-2">FsFs</div>
+        <p class="text-body-1 text-medium-emphasis mb-0">
+          個人資源伺服器：瀏覽資料夾、下載檔案，登入後即可上傳與管理內容。
+        </p>
       </div>
-      <div class="file-path-wrapper">
-        <input class="file-path validate" type="text" placeholder="只允許上傳單一檔案" />
+
+      <div class="d-flex align-center justify-space-between mb-4">
+        <div>
+          <div class="text-h6 font-weight-bold">最近上傳</div>
+          <div class="text-body-2 text-medium-emphasis">目前暫用現有檔案列表，之後會改接專用 API</div>
+        </div>
+        <v-btn rounded="xl" variant="tonal" color="primary" to="/folder" prepend-icon="mdi-folder-outline">
+          瀏覽全部
+        </v-btn>
       </div>
-    </div>
-    <div class="col s12 input-field">
-      <input id="file_name" type="text" class="validate" v-model="fileName" />
-      <label for="file_name">檔案名稱(無須副檔名)</label>
-    </div>
-    <div class="col s12 input-field mobile-hidden">
-      <select v-model="updateDirectory">
-        <option class="validate" value="" disabled selected>選擇資料夾</option>
-        <option v-for="(item, index) in directory" :key="index" :value="item">
-          {{ item }}
-        </option>
-      </select>
-    </div>
-    <div class="col s12 input-field mobile-display">
-      <select v-model="updateDirectory" class="browser-default">
-        <option class="validate" value="" disabled selected>選擇資料夾</option>
-        <option v-for="(item, index) in directory" :key="index" :value="item">
-          {{ item }}
-        </option>
-      </select>
-    </div>
-    <div class="col s12">
-      <button class="button-common flex-btn" type="button" name="action" @click="upload">
-        上傳
-        <i class="material-icons right">send</i>
-      </button>
-    </div>
-  </div>
+
+      <v-card rounded="xl" elevation="2">
+        <v-skeleton-loader v-if="loading" type="list-item-avatar@5" />
+        <v-list v-else-if="files.length" lines="one" class="py-2">
+          <v-list-item
+            v-for="(item, index) in files"
+            :key="index"
+            :prepend-icon="fileIcon(item)"
+            :title="item"
+            rounded="lg"
+            class="mx-2"
+            @click="openFile(item)"
+          >
+            <template #append>
+              <v-icon icon="mdi-open-in-new" size="small" class="text-medium-emphasis" />
+            </template>
+          </v-list-item>
+        </v-list>
+        <div v-else class="pa-10 text-center text-medium-emphasis">
+          <v-icon icon="mdi-file-search-outline" size="48" class="mb-3" />
+          <div>目前尚無檔案</div>
+        </div>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+.home-hero {
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.14), rgba(var(--v-theme-accent), 0.08));
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
+</style>
