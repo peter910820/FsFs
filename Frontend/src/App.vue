@@ -5,9 +5,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+import { useTheme } from "vuetify";
 
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import EmptyLayout from "@/layouts/EmptyLayout.vue";
+import { themeStore } from "@/store/theme";
+
+themeStore.bind(useTheme());
 
 const route = useRoute();
 
