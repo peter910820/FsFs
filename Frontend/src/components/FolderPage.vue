@@ -162,13 +162,13 @@ onMounted(async () => {
       <!-- 桌面：左欄資料夾 -->
       <v-col cols="12" md="3" class="d-none d-md-block">
         <v-card class="folder-panel" rounded="xl" elevation="2">
-          <v-list nav density="comfortable" class="pa-2">
+          <v-list nav density="comfortable" class="pa-2" color="primary">
             <v-list-subheader>資料夾</v-list-subheader>
             <v-list-item
               title="全部"
               prepend-icon="mdi-file-multiple-outline"
               :active="selectedDir === null"
-              color="primary"
+              active-class="folder-item--active"
               rounded="lg"
               @click="loadAllFiles"
             />
@@ -178,7 +178,7 @@ onMounted(async () => {
               :title="dir"
               prepend-icon="mdi-folder-outline"
               :active="selectedDir === dir"
-              color="primary"
+              active-class="folder-item--active"
               rounded="lg"
               @click="expandDetails(dir)"
             />
@@ -249,5 +249,16 @@ onMounted(async () => {
 .folder-chips {
   overflow-x: auto;
   flex-wrap: nowrap;
+}
+
+:deep(.folder-item--active) {
+  background-color: rgba(var(--v-theme-primary), 0.12);
+  color: rgb(var(--v-theme-primary));
+}
+
+:deep(.folder-item--active .v-list-item__prepend .v-icon),
+:deep(.folder-item--active .v-list-item-title) {
+  color: rgb(var(--v-theme-primary));
+  opacity: 1;
 }
 </style>
