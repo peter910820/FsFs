@@ -14,7 +14,6 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: () => import("@/components/MainPage.vue"),
-    beforeEnter: async (to, from, next) => middlware(to, from, next),
   },
   {
     path: "/folder",

@@ -1,178 +1,253 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import type { ResponseType } from "@/types/response";
 
 import { getDirectory, getFile } from "@/utils/apiHandler";
+import { useLoginStore } from "@/store/login";
 
 const router = useRouter();
+const loginStore = useLoginStore();
 
-const dirData = ref<string[]>([]);
-const fileData = ref<string[]>([]);
+const directories = ref<string[]>([]);
+const files = ref<string[]>([]);
+const selectedDir = ref<string | null>(null);
+const loading = ref(true);
+const loadingFiles = ref(false);
+
+const deleteDialog = ref(false);
+const pendingDelete = ref<string | null>(null);
+const deleting = ref(false);
+
+const currentLabel = computed(() => (selectedDir.value ? selectedDir.value : "全部檔案"));
+
+const apiBase = () => import.meta.env.VITE_API_DOMAIN || "";
+
+const fileIcon = (name: string) => {
+  const lower = name.toLowerCase();
+  if ([".png", ".jpg", ".jpeg", ".gif", ".webp"].some((ext) => lower.endsWith(ext))) return "mdi-image-outline";
+  if ([".zip", ".rar", ".7z", ".tar.gz"].some((ext) => lower.endsWith(ext))) return "mdi-folder-zip-outline";
+  if ([".go", ".py", ".fs", ".cs", ".ts", ".js"].some((ext) => lower.endsWith(ext))) return "mdi-code-braces";
+  if ([".mp4", ".mkv", ".webm"].some((ext) => lower.endsWith(ext))) return "mdi-video-outline";
+  if ([".mp3", ".wav", ".flac"].some((ext) => lower.endsWith(ext))) return "mdi-music-note";
+  if (lower.endsWith(".xp3")) return "mdi-cog-outline";
+  return "mdi-file-outline";
+};
+
+const handleError = (error: unknown) => {
+  if (axios.isAxiosError(error)) {
+    sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
+  } else if (error instanceof Error) {
+    sessionStorage.setItem("errorMsg", `例外錯誤 ${error.message}`);
+  } else {
+    sessionStorage.setItem("errorMsg", "例外錯誤");
+  }
+  router.push("/error");
+};
+
+const loadAllFiles = async () => {
+  loadingFiles.value = true;
+  selectedDir.value = null;
+  const response = await getFile();
+  if (response && response.status === 200) {
+    files.value = response.data.data ?? [];
+  } else {
+    sessionStorage.setItem("errorMsg", response?.data?.msg ?? "無法取得檔案列表");
+    router.push("/error");
+  }
+  loadingFiles.value = false;
+};
 
 const expandDetails = async (folder: string) => {
-  const apiUrl = import.meta.env.VITE_API_DOMAIN
-    ? `${import.meta.env.VITE_API_DOMAIN}/api/files?dir=${folder}`
-    : `/api/files?dir=${folder}`;
+  loadingFiles.value = true;
+  selectedDir.value = folder;
   try {
-    const response = await axios.get<ResponseType<string[]>>(apiUrl);
-    fileData.value = response.data.data ?? [];
-  } catch (error: any) {
-    if (axios.isAxiosError(error)) {
-      sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
-    } else {
-      sessionStorage.setItem("errorMsg", `例外錯誤 ${error.message}`);
-    }
-    router.push("/error");
+    const response = await axios.get<ResponseType<string[]>>(`${apiBase()}/api/files?dir=${folder}`);
+    files.value = response.data.data ?? [];
+  } catch (error) {
+    handleError(error);
+  } finally {
+    loadingFiles.value = false;
   }
 };
 
-const goToUrl = async (url: string) => {
-  window.location.href = import.meta.env.VITE_STATIC_FILE_DOMAIN + "/" + url;
+const openFile = (path: string) => {
+  window.location.href = `${import.meta.env.VITE_STATIC_FILE_DOMAIN}/${path}`;
 };
 
-const deleteFile = async (url: string) => {
-  if (confirm("確定刪除?")) {
-    const apiUrl = import.meta.env.VITE_API_DOMAIN ? `${import.meta.env.VITE_API_DOMAIN}/api/file` : `/api/file`;
-    try {
-      const response = await axios.delete<ResponseType<string[]>>(apiUrl, {
-        data: { fileName: url },
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
-      fileData.value = response.data.data ?? [];
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
-      } else {
-        sessionStorage.setItem("errorMsg", `例外錯誤 ${error.message}`);
-      }
-      router.push("/error");
+const askDelete = (path: string) => {
+  pendingDelete.value = path;
+  deleteDialog.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!pendingDelete.value) return;
+  deleting.value = true;
+  try {
+    await axios.delete<ResponseType<string[]>>(`${apiBase()}/api/file`, {
+      data: { fileName: pendingDelete.value },
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true,
+    });
+    deleteDialog.value = false;
+    pendingDelete.value = null;
+    if (selectedDir.value) {
+      await expandDetails(selectedDir.value);
+    } else {
+      await loadAllFiles();
     }
+  } catch (error) {
+    deleteDialog.value = false;
+    handleError(error);
+  } finally {
+    deleting.value = false;
   }
 };
 
 onMounted(async () => {
-  let response = await getDirectory();
-  if (response && response.status === 200) {
-    dirData.value = response.data.data ?? [];
+  const dirResponse = await getDirectory();
+  if (dirResponse && dirResponse.status === 200) {
+    directories.value = dirResponse.data.data ?? [];
   } else {
-    sessionStorage.setItem("errorMsg", response?.data?.msg);
+    sessionStorage.setItem("errorMsg", dirResponse?.data?.msg ?? "無法取得資料夾列表");
+    router.push("/error");
+    loading.value = false;
+    return;
+  }
+
+  const fileResponse = await getFile();
+  if (fileResponse && fileResponse.status === 200) {
+    files.value = fileResponse.data.data ?? [];
+  } else {
+    sessionStorage.setItem("errorMsg", fileResponse?.data?.msg ?? "無法取得檔案列表");
     router.push("/error");
   }
-  response = await getFile();
-  if (response && response.status === 200) {
-    fileData.value = response.data.data ?? [];
-  } else {
-    sessionStorage.setItem("errorMsg", response?.data?.msg);
-    router.push("/error");
-  }
+  loading.value = false;
 });
 </script>
 
 <template>
-  <div class="row main-block">
-    <h1 class="center">伺服器資源</h1>
-    <div class="col l4 m12 s12 file-block input-field">
-      <div class="row">
-        <div class="col s12 folder-block-title">📁選擇資料夾</div>
-        <div class="col s12 folder" v-for="(item, index) in dirData" :key="index" :value="item">
-          <input type="button" class="button-folder" @click="expandDetails(item)" :value="item" />
-        </div>
-      </div>
+  <div>
+    <div class="mb-6">
+      <div class="text-h5 font-weight-bold">伺服器資源</div>
+      <div class="text-body-2 text-medium-emphasis">目前檢視：{{ currentLabel }}</div>
     </div>
-    <div class="col l8 m12 s12 file-block input-field">
-      <div class="row">
-        <div class="col s12 file-block-title">📂資料夾內容</div>
-        <div
-          class="col s12 wow animate__fadeInRightBig floatup-div file ellipsis"
-          v-for="(item, index) in fileData"
-          @click="goToUrl(item)"
-          :key="index"
-          :value="item"
-        >
-          <a>
-            <div v-if="['.png', '.jpg', '.jpeg'].some((ext) => item.toLowerCase().endsWith(ext))">🖼️{{ item }}</div>
-            <div v-else-if="['.zip', '.rar', '.7z', '.tar.gz'].some((ext) => item.toLowerCase().endsWith(ext))">
-              🗃️{{ item }}
-            </div>
-            <div v-else-if="['.go', '.py', '.fs', '.cs'].some((ext) => item.toLowerCase().endsWith(ext))">
-              💻{{ item }}
-            </div>
-            <div v-else-if="['.xp3'].some((ext) => item.toLowerCase().endsWith(ext))">⚙️{{ item }}</div>
-            <div v-else>📃{{ item }}</div>
-          </a>
-          <input type="button" class="button-delete" @click.stop="deleteFile(item)" value="刪除" />
+
+    <v-row>
+      <!-- 手機：橫向資料夾 chip -->
+      <v-col cols="12" class="d-md-none pb-0">
+        <div class="folder-chips d-flex ga-2 pb-2">
+          <v-chip
+            :color="selectedDir === null ? 'primary' : undefined"
+            :variant="selectedDir === null ? 'flat' : 'tonal'"
+            prepend-icon="mdi-file-multiple-outline"
+            @click="loadAllFiles"
+          >
+            全部
+          </v-chip>
+          <v-chip
+            v-for="dir in directories"
+            :key="dir"
+            :color="selectedDir === dir ? 'primary' : undefined"
+            :variant="selectedDir === dir ? 'flat' : 'tonal'"
+            prepend-icon="mdi-folder-outline"
+            @click="expandDetails(dir)"
+          >
+            {{ dir }}
+          </v-chip>
         </div>
-      </div>
-    </div>
+      </v-col>
+
+      <!-- 桌面：左欄資料夾 -->
+      <v-col cols="12" md="3" class="d-none d-md-block">
+        <v-card class="folder-panel" rounded="xl" elevation="2">
+          <v-list nav density="comfortable" class="pa-2">
+            <v-list-subheader>資料夾</v-list-subheader>
+            <v-list-item
+              title="全部"
+              prepend-icon="mdi-file-multiple-outline"
+              :active="selectedDir === null"
+              color="primary"
+              rounded="lg"
+              @click="loadAllFiles"
+            />
+            <v-list-item
+              v-for="dir in directories"
+              :key="dir"
+              :title="dir"
+              prepend-icon="mdi-folder-outline"
+              :active="selectedDir === dir"
+              color="primary"
+              rounded="lg"
+              @click="expandDetails(dir)"
+            />
+          </v-list>
+        </v-card>
+      </v-col>
+
+      <!-- 右欄檔案 -->
+      <v-col cols="12" md="9">
+        <v-card rounded="xl" elevation="2">
+          <v-skeleton-loader v-if="loading || loadingFiles" type="list-item-avatar@6" />
+          <v-list v-else-if="files.length" lines="one" class="py-2">
+            <v-list-item
+              v-for="item in files"
+              :key="item"
+              :prepend-icon="fileIcon(item)"
+              :title="item"
+              rounded="lg"
+              class="mx-2"
+              @click="openFile(item)"
+            >
+              <template #append>
+                <v-btn
+                  v-if="loginStore.status"
+                  icon="mdi-delete-outline"
+                  size="small"
+                  variant="text"
+                  color="error"
+                  aria-label="刪除"
+                  @click.stop="askDelete(item)"
+                />
+                <v-icon v-else icon="mdi-open-in-new" size="small" class="text-medium-emphasis" />
+              </template>
+            </v-list-item>
+          </v-list>
+          <div v-else class="pa-10 text-center text-medium-emphasis">
+            <v-icon icon="mdi-file-search-outline" size="48" class="mb-3" />
+            <div>此處尚無檔案</div>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-dialog v-model="deleteDialog" max-width="420" rounded="xl">
+      <v-card rounded="xl" class="pa-2">
+        <v-card-title class="text-h6">確認刪除</v-card-title>
+        <v-card-text>
+          確定刪除
+          <span class="font-weight-medium">{{ pendingDelete }}</span>
+          ？此操作無法復原。
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" rounded="xl" :disabled="deleting" @click="deleteDialog = false">取消</v-btn>
+          <v-btn color="error" variant="flat" rounded="xl" :loading="deleting" @click="confirmDelete">刪除</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <style scoped>
-a {
-  font-size: 25px;
-}
-.center {
-  text-align: center;
-}
-.folder {
-  margin-top: 10px;
-  > input {
-    width: 150px;
-    height: 50px;
-    font-size: 20px;
-  }
-}
-.file {
-  border: 2px solid skyblue;
-  border-radius: 100px;
-  margin-bottom: 10px;
-  padding: 20px;
-  cursor: pointer;
-}
-.folder-block-title {
-  font-size: 30px;
-}
-.file-block-title {
-  font-size: 30px;
-}
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.folder-panel {
+  position: sticky;
+  top: 88px;
 }
 
-.button-delete {
-  background-color: #ea4c89;
-  border-radius: 8px;
-  border-style: none;
-  box-sizing: border-box;
-  color: #ffffff;
-  cursor: pointer;
-  display: inline-block;
-  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  height: 40px;
-  line-height: 20px;
-  list-style: none;
-  margin: 0;
-  outline: none;
-  padding: 10px 16px;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  transition: color 100ms;
-  vertical-align: baseline;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
-
-.button-delete:hover,
-.button-delete:focus {
-  background-color: #f082ac;
+.folder-chips {
+  overflow-x: auto;
+  flex-wrap: nowrap;
 }
 </style>
