@@ -41,6 +41,9 @@ const toggleTheme = (event: MouseEvent) => {
     <div class="d-none d-md-flex ga-4 align-center me-4">
       <v-btn rounded="xl" variant="text" to="/" prepend-icon="mdi-home">首頁</v-btn>
       <v-btn rounded="xl" variant="text" to="/folder" prepend-icon="mdi-folder-open">檔案夾</v-btn>
+      <v-btn v-if="loginStore.status" rounded="xl" variant="text" to="/upload" prepend-icon="mdi-cloud-upload">
+        上傳
+      </v-btn>
     </div>
 
     <div class="d-flex align-center ga-3 me-1 me-md-2">
@@ -78,6 +81,15 @@ const toggleTheme = (event: MouseEvent) => {
         title="檔案夾"
         prepend-icon="mdi-folder-open"
         to="/folder"
+        @click="drawer = false"
+      />
+      <v-list-item
+        v-if="loginStore.status"
+        class="mb-2"
+        rounded="xl"
+        title="上傳"
+        prepend-icon="mdi-cloud-upload"
+        to="/upload"
         @click="drawer = false"
       />
       <v-list-item

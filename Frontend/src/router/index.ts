@@ -22,6 +22,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/components/FolderPage.vue"),
   },
   {
+    path: "/upload",
+    name: "upload",
+    component: () => import("@/components/UploadPage.vue"),
+    beforeEnter: async (to, from, next) => middlware(to, from, next),
+  },
+  {
     path: "/error",
     name: "error",
     component: () => import("@/components/ErrorPage.vue"),
