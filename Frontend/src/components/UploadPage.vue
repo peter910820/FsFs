@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import axios from "axios";
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 
+import BlockError from "@/components/BlockError.vue";
 import { getDirectory } from "@/utils/apiHandler";
-
-const router = useRouter();
 
 const directories = ref<string[]>([]);
 const selectedDirectory = ref<string | null>(null);
@@ -13,6 +11,7 @@ const file = ref<File[]>([]);
 const fileName = ref("");
 const loading = ref(false);
 const loadingDirs = ref(true);
+const errorDirs = ref<string | null>(null);
 const snackbar = ref(false);
 const snackbarText = ref("");
 const snackbarColor = ref("success");
@@ -23,16 +22,20 @@ const showMessage = (text: string, color = "success") => {
   snackbar.value = true;
 };
 
-onMounted(async () => {
+const loadDirectories = async () => {
   loadingDirs.value = true;
+  errorDirs.value = null;
   const response = await getDirectory();
   if (response && response.status === 200) {
     directories.value = response.data.data ?? [];
   } else {
-    router.push("/error");
+    directories.value = [];
+    errorDirs.value = response?.data?.msg ?? "無法取得資料夾列表";
   }
   loadingDirs.value = false;
-});
+};
+
+onMounted(loadDirectories);
 
 const isValidLinuxFileName = (name: string) => {
   if (!name || name.trim() === "") return false;
@@ -85,13 +88,12 @@ const upload = async () => {
     fileName.value = "";
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
+      showMessage(error.response?.data?.msg || error.message, "error");
     } else if (error instanceof Error) {
-      sessionStorage.setItem("errorMsg", `例外錯誤 ${error.message}`);
+      showMessage(`例外錯誤 ${error.message}`, "error");
     } else {
-      sessionStorage.setItem("errorMsg", "例外錯誤");
+      showMessage("上傳失敗", "error");
     }
-    router.push("/error");
   } finally {
     loading.value = false;
   }
@@ -115,11 +117,13 @@ const upload = async () => {
         </div>
 
         <v-card-text class="pa-8">
+          <v-skeleton-loader v-if="loadingDirs" type="heading" class="mb-5" />
+          <BlockError v-else-if="errorDirs" class="mb-5" :message="errorDirs" @retry="loadDirectories" />
           <v-select
+            v-else
             v-model="selectedDirectory"
             class="mb-5"
             :items="directories"
-            :loading="loadingDirs"
             label="上傳資料夾"
             placeholder="選擇資料夾"
             prepend-inner-icon="mdi-folder-outline"
@@ -160,6 +164,7 @@ const upload = async () => {
             variant="flat"
             prepend-icon="mdi-send"
             :loading="loading"
+            :disabled="!!errorDirs"
             @click="upload"
           >
             上傳

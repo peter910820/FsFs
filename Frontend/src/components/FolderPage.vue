@@ -1,28 +1,49 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import axios from "axios";
 import type { ResponseType } from "@/types/response";
 
+import BlockError from "@/components/BlockError.vue";
 import { getDirectory, getFile } from "@/utils/apiHandler";
 import { useLoginStore } from "@/store/login";
 
-const router = useRouter();
 const loginStore = useLoginStore();
 
 const directories = ref<string[]>([]);
 const files = ref<string[]>([]);
 const selectedDir = ref<string | null>(null);
-const loading = ref(true);
+const loadingDirs = ref(true);
 const loadingFiles = ref(false);
+const errorDirs = ref<string | null>(null);
+const errorFiles = ref<string | null>(null);
 
 const deleteDialog = ref(false);
 const pendingDelete = ref<string | null>(null);
 const deleting = ref(false);
 
+const snackbar = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("error");
+
 const currentLabel = computed(() => (selectedDir.value ? selectedDir.value : "全部檔案"));
 
 const apiBase = () => import.meta.env.VITE_API_DOMAIN || "";
+
+const errorMessage = (error: unknown, fallback: string) => {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data?.msg || error.message || fallback;
+  }
+  if (error instanceof Error) {
+    return error.message || fallback;
+  }
+  return fallback;
+};
+
+const showSnackbar = (text: string, color = "error") => {
+  snackbarText.value = text;
+  snackbarColor.value = color;
+  snackbar.value = true;
+};
 
 const fileIcon = (name: string) => {
   const lower = name.toLowerCase();
@@ -35,38 +56,43 @@ const fileIcon = (name: string) => {
   return "mdi-file-outline";
 };
 
-const handleError = (error: unknown) => {
-  if (axios.isAxiosError(error)) {
-    sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
-  } else if (error instanceof Error) {
-    sessionStorage.setItem("errorMsg", `例外錯誤 ${error.message}`);
+const loadDirectories = async () => {
+  loadingDirs.value = true;
+  errorDirs.value = null;
+  const response = await getDirectory();
+  if (response && response.status === 200) {
+    directories.value = response.data.data ?? [];
   } else {
-    sessionStorage.setItem("errorMsg", "例外錯誤");
+    directories.value = [];
+    errorDirs.value = response?.data?.msg ?? "無法取得資料夾列表";
   }
-  router.push("/error");
+  loadingDirs.value = false;
 };
 
 const loadAllFiles = async () => {
   loadingFiles.value = true;
+  errorFiles.value = null;
   selectedDir.value = null;
   const response = await getFile();
   if (response && response.status === 200) {
     files.value = response.data.data ?? [];
   } else {
-    sessionStorage.setItem("errorMsg", response?.data?.msg ?? "無法取得檔案列表");
-    router.push("/error");
+    files.value = [];
+    errorFiles.value = response?.data?.msg ?? "無法取得檔案列表";
   }
   loadingFiles.value = false;
 };
 
 const expandDetails = async (folder: string) => {
   loadingFiles.value = true;
+  errorFiles.value = null;
   selectedDir.value = folder;
   try {
     const response = await axios.get<ResponseType<string[]>>(`${apiBase()}/api/files?dir=${folder}`);
     files.value = response.data.data ?? [];
   } catch (error) {
-    handleError(error);
+    files.value = [];
+    errorFiles.value = errorMessage(error, "無法取得檔案列表");
   } finally {
     loadingFiles.value = false;
   }
@@ -99,31 +125,14 @@ const confirmDelete = async () => {
     }
   } catch (error) {
     deleteDialog.value = false;
-    handleError(error);
+    showSnackbar(errorMessage(error, "刪除失敗"));
   } finally {
     deleting.value = false;
   }
 };
 
 onMounted(async () => {
-  const dirResponse = await getDirectory();
-  if (dirResponse && dirResponse.status === 200) {
-    directories.value = dirResponse.data.data ?? [];
-  } else {
-    sessionStorage.setItem("errorMsg", dirResponse?.data?.msg ?? "無法取得資料夾列表");
-    router.push("/error");
-    loading.value = false;
-    return;
-  }
-
-  const fileResponse = await getFile();
-  if (fileResponse && fileResponse.status === 200) {
-    files.value = fileResponse.data.data ?? [];
-  } else {
-    sessionStorage.setItem("errorMsg", fileResponse?.data?.msg ?? "無法取得檔案列表");
-    router.push("/error");
-  }
-  loading.value = false;
+  await Promise.all([loadDirectories(), loadAllFiles()]);
 });
 </script>
 
@@ -137,7 +146,8 @@ onMounted(async () => {
     <v-row>
       <!-- 手機：橫向資料夾 chip -->
       <v-col cols="12" class="d-md-none pb-0">
-        <div class="folder-chips d-flex ga-2 pb-2">
+        <BlockError v-if="errorDirs && !loadingDirs" :message="errorDirs" @retry="loadDirectories" />
+        <div v-else class="folder-chips d-flex ga-2 pb-2">
           <v-chip
             :color="selectedDir === null ? 'primary' : undefined"
             :variant="selectedDir === null ? 'flat' : 'tonal'"
@@ -162,7 +172,9 @@ onMounted(async () => {
       <!-- 桌面：左欄資料夾 -->
       <v-col cols="12" md="3" class="d-none d-md-block">
         <v-card class="folder-panel" rounded="xl" elevation="2">
-          <v-list nav density="comfortable" class="pa-2" color="primary">
+          <v-skeleton-loader v-if="loadingDirs" type="list-item@4" />
+          <BlockError v-else-if="errorDirs" :message="errorDirs" @retry="loadDirectories" />
+          <v-list v-else nav density="comfortable" class="pa-2" color="primary">
             <v-list-subheader>資料夾</v-list-subheader>
             <v-list-item
               title="全部"
@@ -189,7 +201,12 @@ onMounted(async () => {
       <!-- 右欄檔案 -->
       <v-col cols="12" md="9">
         <v-card rounded="xl" elevation="2">
-          <v-skeleton-loader v-if="loading || loadingFiles" type="list-item-avatar@6" />
+          <v-skeleton-loader v-if="loadingFiles" type="list-item-avatar@6" />
+          <BlockError
+            v-else-if="errorFiles"
+            :message="errorFiles"
+            @retry="selectedDir ? expandDetails(selectedDir) : loadAllFiles()"
+          />
           <v-list v-else-if="files.length" lines="one" class="py-2">
             <v-list-item
               v-for="item in files"
@@ -237,6 +254,10 @@ onMounted(async () => {
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-snackbar v-model="snackbar" :color="snackbarColor" rounded="pill" timeout="3000">
+      {{ snackbarText }}
+    </v-snackbar>
   </div>
 </template>
 

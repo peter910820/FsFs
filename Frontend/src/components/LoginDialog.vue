@@ -15,6 +15,7 @@ const loginStore = useLoginStore();
 const userStore = useUserStore();
 
 const loading = ref(false);
+const error = ref<string | null>(null);
 const form = ref({
   username: "",
   password: "",
@@ -23,6 +24,7 @@ const form = ref({
 watch(open, (value) => {
   if (!value) {
     form.value = { username: "", password: "" };
+    error.value = null;
   }
 });
 
@@ -34,25 +36,26 @@ const handleSubmit = async () => {
   if (!form.value.username.trim() || !form.value.password) return;
 
   loading.value = true;
+  error.value = null;
   try {
     const apiUrl = import.meta.env.VITE_API_DOMAIN ? `${import.meta.env.VITE_API_DOMAIN}/api/login` : "/api/login";
     const response = await axios.post<ResponseType<LoginResponse>>(apiUrl, form.value, {
       withCredentials: true,
     });
-    sessionStorage.setItem("errorMsg", response.data.msg);
     if (response.data.data) {
       userStore.set(response.data.data);
       loginStore.set(true);
       close();
-    }
-    router.push("/");
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      sessionStorage.setItem("errorMsg", `${error.response?.status}: ${error.response?.data.msg}`);
+      router.push("/");
     } else {
-      sessionStorage.setItem("errorMsg", String(error));
+      error.value = response.data.msg || "登入失敗";
     }
-    router.push("/error");
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      error.value = err.response?.data?.msg || err.message || "登入失敗";
+    } else {
+      error.value = "登入失敗";
+    }
   } finally {
     loading.value = false;
   }
@@ -71,6 +74,9 @@ const handleSubmit = async () => {
       </div>
 
       <v-card-text class="px-8 pb-2">
+        <v-alert v-if="error" class="mb-4" type="error" variant="tonal" rounded="lg" density="comfortable">
+          {{ error }}
+        </v-alert>
         <v-form @submit.prevent="handleSubmit">
           <v-text-field
             v-model="form.username"

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 
+import BlockError from "@/components/BlockError.vue";
 import { getFile } from "@/utils/apiHandler";
 
-const router = useRouter();
 const files = ref<string[]>([]);
 const loading = ref(true);
+const error = ref<string | null>(null);
 
 const fileIcon = (name: string) => {
   const lower = name.toLowerCase();
@@ -22,16 +22,20 @@ const openFile = (path: string) => {
   window.location.href = `${import.meta.env.VITE_STATIC_FILE_DOMAIN}/${path}`;
 };
 
-onMounted(async () => {
+const loadFiles = async () => {
+  loading.value = true;
+  error.value = null;
   const response = await getFile();
   if (response && response.status === 200) {
     files.value = response.data.data ?? [];
   } else {
-    sessionStorage.setItem("errorMsg", response?.data?.msg ?? "無法取得檔案列表");
-    router.push("/error");
+    files.value = [];
+    error.value = response?.data?.msg ?? "無法取得檔案列表";
   }
   loading.value = false;
-});
+};
+
+onMounted(loadFiles);
 </script>
 
 <template>
@@ -56,6 +60,7 @@ onMounted(async () => {
 
       <v-card rounded="xl" elevation="2">
         <v-skeleton-loader v-if="loading" type="list-item-avatar@5" />
+        <BlockError v-else-if="error" :message="error" @retry="loadFiles" />
         <v-list v-else-if="files.length" lines="one" class="py-2">
           <v-list-item
             v-for="(item, index) in files"
