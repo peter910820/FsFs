@@ -22,6 +22,8 @@
 | 前端  | Vue 3、TypeScript、Vite、Pinia、Materialize CSS     |
 
 
+
+
 ## 專案結構
 
 ```
@@ -81,18 +83,30 @@ yarn dev
 ### 後端（`.env`）
 
 
-| 變數                                                    | 說明                                           |
-| ----------------------------------------------------- | -------------------------------------------- |
-| `DB_HOST` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` | PostgreSQL 連線                                |
-| `DB_MAX_POOL_SIZE`                                    | 連線池上限                                        |
-| `RUNTIME_PORT`                                        | 監聽位址，例如 `http://localhost:5000`              |
-| `DOMAIN`                                              | Cookie Domain                                |
-| `ALLOW_CORS`                                          | 允許的 CORS Origin                              |
-| `CONTENT_ROOT`                                        | 檔案根目錄（實際存放上傳／列表的路徑）                          |
-| `START_MODE`                                          | `NGINX`：靜態檔由外部代理；`Manual`：後端掛載 `/resource/*` |
+| 變數                                                    | 說明                                                           |
+| ----------------------------------------------------- | ------------------------------------------------------------ |
+| `DB_HOST` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` | PostgreSQL 連線                                                |
+| `DB_MAX_POOL_SIZE`                                    | 連線池上限                                                        |
+| `RUNTIME_PORT`                                        | 監聽位址，例如 `http://127.0.0.1:3023`                              |
+| `IS_PRODUCTION`                                       | `false` 本機／`true` 生產；決定 cookie 的 Secure、SameSite、是否套用 Domain |
+| `DOMAIN`                                              | Cookie Domain；**僅** `IS_PRODUCTION=true` 時必填                 |
+| `ALLOW_CORS`                                          | 允許的 CORS Origin                                              |
+| `CONTENT_ROOT`                                        | 檔案根目錄（實際存放上傳／列表的路徑）                                          |
+| `START_MODE`                                          | `NGINX`：靜態檔由外部代理；`Manual`：後端掛載 `/resource/*`                 |
 
 
 
+
+### Cookie 行為（由 `IS_PRODUCTION` 自動決定）
+
+
+| `IS_PRODUCTION` | Secure  | SameSite | Domain      |
+| --------------- | ------- | -------- | ----------- |
+| `false`         | `false` | `Lax`    | 不設定         |
+| `true`          | `true`  | `None`   | 使用 `DOMAIN` |
+
+
+ `ALLOW_CORS` 需設定前端 Origin。
 
 ### 前端（`Frontend/.env`）
 
