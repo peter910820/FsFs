@@ -11,7 +11,7 @@ open FsFs.Infrastructure.Database
 open FsFs.Models.DtoModel
 open FsFs.Infrastructure.ResponseFactory
 
-let loginHandler : HttpHandler =
+let loginHandler: HttpHandler =
     fun next ctx ->
         task {
             let! loginData = ctx.BindJsonAsync<Request.LoginRequest>()
@@ -24,18 +24,19 @@ let loginHandler : HttpHandler =
                 let sessionId = Guid.NewGuid().ToString "N"
                 cache.Set(sessionId, user.Id, DateTime.UtcNow.AddMinutes 30.0) |> ignore
                 // * 設置Cookies
-                ctx.Response.Cookies.Append(
-                    "sid",
-                    sessionId,
+                let cookieOptions =
                     CookieOptions(
                         HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.None, // 跨子網域
-                        Domain = config.Domain,
+                        Secure = config.CookieSecure,
+                        SameSite = config.CookieSameSite,
                         Path = "/",
                         Expires = Nullable(DateTimeOffset.UtcNow.AddMinutes 30.0)
                     )
-                )
+
+                config.Domain
+                |> Option.iter (fun domain -> cookieOptions.Domain <- domain)
+
+                ctx.Response.Cookies.Append("sid", sessionId, cookieOptions)
 
                 let loginResponse: Response.LoginResponse =
                     { Username = user.Username
