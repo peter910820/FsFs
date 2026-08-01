@@ -13,29 +13,29 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "home",
-    component: () => import("@/components/MainPage.vue"),
+    component: () => import("@/Pages/MainPage.vue"),
   },
   {
     path: "/folder",
     name: "folder",
-    component: () => import("@/components/FolderPage.vue"),
+    component: () => import("@/Pages/FolderPage.vue"),
   },
   {
     path: "/upload",
     name: "upload",
-    component: () => import("@/components/UploadPage.vue"),
+    component: () => import("@/Pages/UploadPage.vue"),
     beforeEnter: async (to, from, next) => middlware(to, from, next),
   },
   {
     path: "/error",
     name: "error",
-    component: () => import("@/components/ErrorPage.vue"),
+    component: () => import("@/Pages/ErrorPage.vue"),
   },
   // match all route
   {
     path: "/:pathMatch(.*)*",
     name: "notFound",
-    component: () => import("@/components/NotFoundPage.vue"),
+    component: () => import("@/Pages/NotFoundPage.vue"),
     meta: { layout: "empty" },
   },
 ];
