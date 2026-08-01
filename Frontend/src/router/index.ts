@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 
 import { useLoginStore } from "@/store/login";
+import { toastStore } from "@/store/toast";
 
 import axios from "axios";
 
@@ -25,11 +26,6 @@ const routes: Array<RouteRecordRaw> = [
     name: "upload",
     component: () => import("@/Pages/UploadPage.vue"),
     beforeEnter: async (to, from, next) => middlware(to, from, next),
-  },
-  {
-    path: "/error",
-    name: "error",
-    component: () => import("@/Pages/ErrorPage.vue"),
   },
   // match all route
   {
@@ -58,11 +54,12 @@ const middlware = async (_to: RouteLocationNormalized, _from: RouteLocationNorma
     if (axios.isAxiosError(error)) {
       sessionStorage.setItem("msg", `${error.response?.status}: ${error.response?.data.msg}`);
       loginStore.set(false);
-      M.toast({ html: "使用者尚未登入！" });
-      router.push("/folder");
+      toastStore.show("使用者尚未登入！");
+      next("/folder");
     } else {
-      sessionStorage.setItem("msg", String(error));
-      router.push("/error");
+      loginStore.set(false);
+      toastStore.show("發生未預期錯誤，已返回首頁", "error");
+      next("/");
     }
   }
 };
