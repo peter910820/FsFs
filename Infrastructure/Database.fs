@@ -19,10 +19,7 @@ type AppDbContext(options: DbContextOptions<AppDbContext>) =
 
 let tryFindUserByUpdateName (db: AppDbContext) (username: string) =
     task {
-        let! user =
-            db.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(fun u -> u.UpdateName = username)
+        let! user = db.Users.AsNoTracking().FirstOrDefaultAsync(fun u -> u.Username = username)
 
         return Option.ofObj user
     }
@@ -32,7 +29,7 @@ let checkDbConnection (services: IServiceProvider) : Async<Result<unit, string>>
         try
             use scope = services.CreateScope()
             let db = scope.ServiceProvider.GetRequiredService<AppDbContext>()
-            let! _ = db.Users.Take(1).ToListAsync() |> Async.AwaitTask
+            let! _ = db.Users.OrderBy(fun u -> u.Id).Take(1).ToListAsync() |> Async.AwaitTask
             return Ok()
         with ex ->
             return Error ex.Message

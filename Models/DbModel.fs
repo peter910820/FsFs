@@ -32,19 +32,14 @@ type User =
       [<Column("exp")>]
       Exp: int
 
-      [<Column("management")>]
-      Management: bool
+      [<Column("is_admin")>]
+      IsAdmin: bool
 
       [<Column("created_at")>]
       CreatedAt: DateTime
 
-      [<Column("create_name")>]
-      [<Required>]
-      CreateName: string
-
       [<Column("updated_at")>]
       UpdatedAt: DateTime
 
-      [<Column("update_name")>]
-      [<Required>]
-      UpdateName: string }
+      [<Column("deleted_at")>]
+      DeletedAt: DateTime Nullable }

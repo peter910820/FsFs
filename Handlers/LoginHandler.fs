@@ -42,7 +42,7 @@ let loginHandler : HttpHandler =
                       Email = user.Email
                       Avatar = user.Avatar
                       Exp = user.Exp
-                      Management = user.Management
+                      IsAdmin = user.IsAdmin
                       CreatedAt = user.CreatedAt }
 
                 return! responseFactory StatusCodes.Status200OK "登入成功" (Some loginResponse) next ctx

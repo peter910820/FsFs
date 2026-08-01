@@ -1,7 +1,6 @@
-// 泛型，定義共通Response
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ResponseType<T = any> {
+// 對應後端 ApiResponse<'T>（Data 為 option，無值時為 null）
+export interface ResponseType<T = unknown> {
   statusCode: number;
   msg: string;
-  data: T;
+  data: T | null;
 }

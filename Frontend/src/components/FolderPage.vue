@@ -17,7 +17,7 @@ const expandDetails = async (folder: string) => {
     : `/api/files?dir=${folder}`;
   try {
     const response = await axios.get<ResponseType<string[]>>(apiUrl);
-    fileData.value = response.data.data;
+    fileData.value = response.data.data ?? [];
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
@@ -39,8 +39,9 @@ const deleteFile = async (url: string) => {
       const response = await axios.delete<ResponseType<string[]>>(apiUrl, {
         data: { fileName: url },
         headers: { "Content-Type": "application/json" },
+        withCredentials: true,
       });
-      fileData.value = response.data.data;
+      fileData.value = response.data.data ?? [];
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         sessionStorage.setItem("errorMsg", error.response?.data?.msg || error.message);
@@ -55,14 +56,14 @@ const deleteFile = async (url: string) => {
 onMounted(async () => {
   let response = await getDirectory();
   if (response && response.status === 200) {
-    dirData.value = response.data.data;
+    dirData.value = response.data.data ?? [];
   } else {
     sessionStorage.setItem("errorMsg", response?.data?.msg);
     router.push("/error");
   }
   response = await getFile();
   if (response && response.status === 200) {
-    fileData.value = response.data.data;
+    fileData.value = response.data.data ?? [];
   } else {
     sessionStorage.setItem("errorMsg", response?.data?.msg);
     router.push("/error");

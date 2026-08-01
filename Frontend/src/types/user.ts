@@ -3,6 +3,6 @@ export interface LoginResponse {
   email: string;
   avatar: string;
   exp: number;
-  management: boolean;
+  isAdmin: boolean;
   createdAt: string;
 }

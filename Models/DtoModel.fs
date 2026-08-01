@@ -20,5 +20,5 @@ module Response =
           Email: string
           Avatar: string
           Exp: int
-          Management: bool
+          IsAdmin: bool
           CreatedAt: DateTime }
