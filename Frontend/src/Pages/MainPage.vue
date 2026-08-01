@@ -51,7 +51,6 @@ onMounted(loadFiles);
       <div class="d-flex align-center justify-space-between mb-4">
         <div>
           <div class="text-h6 font-weight-bold">最近上傳</div>
-          <div class="text-body-2 text-medium-emphasis">目前暫用現有檔案列表，之後會改接專用 API</div>
         </div>
         <v-btn rounded="xl" variant="tonal" color="primary" to="/folder" prepend-icon="mdi-folder-outline">
           瀏覽全部
