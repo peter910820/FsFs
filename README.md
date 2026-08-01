@@ -19,7 +19,7 @@
 | 後端  | F#、Giraffe、ASP.NET Core 8、Entity Framework Core |
 | 資料庫 | PostgreSQL                                      |
 | 認證  | Cookie `sid` + MemoryCache session（BCrypt 驗證密碼） |
-| 前端  | Vue 3、TypeScript、Vite、Pinia、Materialize CSS     |
+| 前端  | Vue 3、TypeScript、Vite、Vuetify                    |
 
 
 

@@ -3,16 +3,13 @@ import axios from "axios";
 import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
-import { useLoginStore } from "@/store/login";
-import { useUserStore } from "@/store/user";
+import { authStore } from "@/store/auth";
 import type { ResponseType } from "@/types/response";
 import type { LoginResponse } from "@/types/user";
 
 const open = defineModel<boolean>({ default: false });
 
 const router = useRouter();
-const loginStore = useLoginStore();
-const userStore = useUserStore();
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -43,8 +40,7 @@ const handleSubmit = async () => {
       withCredentials: true,
     });
     if (response.data.data) {
-      userStore.set(response.data.data);
-      loginStore.set(true);
+      authStore.login(response.data.data);
       close();
       router.push("/");
     } else {

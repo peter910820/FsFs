@@ -2,18 +2,14 @@
 import { computed, ref } from "vue";
 
 import LoginDialog from "@/components/LoginDialog.vue";
-import { useLoginStore } from "@/store/login";
+import { authStore } from "@/store/auth";
 import { themeStore } from "@/store/theme";
-import { useUserStore } from "@/store/user";
-
-const loginStore = useLoginStore();
-const userStore = useUserStore();
 
 const drawer = ref(false);
 const loginOpen = ref(false);
 
+const { status, user } = authStore;
 const isDark = computed(() => themeStore.current.value === "dark");
-const user = computed(() => userStore.user);
 const displayName = computed(() => {
   if (!user.value) return "";
   return user.value.isAdmin ? `${user.value.username}/管理員` : user.value.username;
@@ -41,9 +37,7 @@ const toggleTheme = (event: MouseEvent) => {
     <div class="d-none d-md-flex ga-4 align-center me-4">
       <v-btn rounded="xl" variant="text" to="/" prepend-icon="mdi-home">首頁</v-btn>
       <v-btn rounded="xl" variant="text" to="/folder" prepend-icon="mdi-folder-open">檔案夾</v-btn>
-      <v-btn v-if="loginStore.status" rounded="xl" variant="text" to="/upload" prepend-icon="mdi-cloud-upload">
-        上傳
-      </v-btn>
+      <v-btn v-if="status" rounded="xl" variant="text" to="/upload" prepend-icon="mdi-cloud-upload">上傳</v-btn>
     </div>
 
     <div class="d-flex align-center ga-3 me-1 me-md-2">
@@ -57,7 +51,7 @@ const toggleTheme = (event: MouseEvent) => {
         <v-icon :icon="isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" />
       </v-btn>
 
-      <template v-if="loginStore.status && user">
+      <template v-if="status && user">
         <div class="d-flex align-center ga-3 user-chip px-3 py-1">
           <v-avatar size="40" color="primary" rounded="circle">
             <v-img v-if="user.avatar" :src="user.avatar" :alt="user.username" />
@@ -84,7 +78,7 @@ const toggleTheme = (event: MouseEvent) => {
         @click="drawer = false"
       />
       <v-list-item
-        v-if="loginStore.status"
+        v-if="status"
         class="mb-2"
         rounded="xl"
         title="上傳"
@@ -93,7 +87,7 @@ const toggleTheme = (event: MouseEvent) => {
         @click="drawer = false"
       />
       <v-list-item
-        v-if="!loginStore.status"
+        v-if="!status"
         class="mb-2"
         rounded="xl"
         title="登入"

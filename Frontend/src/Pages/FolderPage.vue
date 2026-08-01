@@ -5,9 +5,9 @@ import type { ResponseType } from "@/types/response";
 
 import BlockError from "@/components/BlockError.vue";
 import { getDirectory, getFile } from "@/utils/apiHandler";
-import { useLoginStore } from "@/store/login";
+import { authStore } from "@/store/auth";
 
-const loginStore = useLoginStore();
+const { status } = authStore;
 
 const directories = ref<string[]>([]);
 const files = ref<string[]>([]);
@@ -219,7 +219,7 @@ onMounted(async () => {
             >
               <template #append>
                 <v-btn
-                  v-if="loginStore.status"
+                  v-if="status"
                   icon="mdi-delete-outline"
                   size="small"
                   variant="text"
