@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 
-import { useLoginStore } from "@/store/login";
+import { authStore } from "@/store/auth";
+import { toastStore } from "@/store/toast";
 
 import axios from "axios";
 
@@ -13,30 +14,29 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "home",
-    component: () => import("@/components/MainPage.vue"),
-    beforeEnter: async (to, from, next) => middlware(to, from, next),
+    component: () => import("@/Pages/MainPage.vue"),
   },
   {
     path: "/folder",
     name: "folder",
-    component: () => import("@/components/FolderPage.vue"),
+    component: () => import("@/Pages/FolderPage.vue"),
   },
   {
-    path: "/error",
-    name: "error",
-    component: () => import("@/components/ErrorPage.vue"),
+    path: "/upload",
+    name: "upload",
+    component: () => import("@/Pages/UploadPage.vue"),
+    beforeEnter: async (to, from, next) => middlware(to, from, next),
   },
   // match all route
   {
     path: "/:pathMatch(.*)*",
     name: "notFound",
-    component: () => import("@/components/NotFoundPage.vue"),
+    component: () => import("@/Pages/NotFoundPage.vue"),
     meta: { layout: "empty" },
   },
 ];
 
 const middlware = async (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-  const loginStore = useLoginStore();
   try {
     const apiUrl = import.meta.env.VITE_API_DOMAIN ? `${import.meta.env.VITE_API_DOMAIN}/api/auth` : "/api/auth";
     const response = await axios.post<ResponseType<null>>(
@@ -47,17 +47,18 @@ const middlware = async (_to: RouteLocationNormalized, _from: RouteLocationNorma
       },
     );
     sessionStorage.setItem("msg", response.data.msg); // ?
-    loginStore.set(true);
+    authStore.setStatus(true);
     next();
   } catch (error) {
     if (axios.isAxiosError(error)) {
       sessionStorage.setItem("msg", `${error.response?.status}: ${error.response?.data.msg}`);
-      loginStore.set(false);
-      M.toast({ html: "使用者尚未登入！" });
-      router.push("/folder");
+      authStore.logout();
+      toastStore.show("使用者尚未登入！");
+      next("/folder");
     } else {
-      sessionStorage.setItem("msg", String(error));
-      router.push("/error");
+      authStore.logout();
+      toastStore.show("發生未預期錯誤，已返回首頁", "error");
+      next("/");
     }
   }
 };
