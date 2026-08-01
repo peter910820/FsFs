@@ -62,4 +62,25 @@ export default createVuetify({
       dark: darkTheme,
     },
   },
+  defaults: {
+    VBtn: {
+      rounded: "lg",
+    },
+    VCard: {
+      rounded: "xl",
+    },
+    VTextField: {
+      rounded: "lg",
+      variant: "outlined",
+    },
+    VListItem: {
+      rounded: "lg",
+    },
+    VNavigationDrawer: {
+      rounded: 0,
+    },
+    VDialog: {
+      scrim: true,
+    },
+  },
 });
