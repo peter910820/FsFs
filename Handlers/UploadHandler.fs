@@ -14,7 +14,8 @@ type UploadError =
     | DirectoryNotFound
     | UnknownError of string
 
-let private validatePath (dirPath: string) : Result<string, UploadError> =
+/// <summary>拒絕含 / 或 .. 的上傳目錄名</summary>
+let validatePath (dirPath: string) : Result<string, UploadError> =
     if dirPath.Contains "/" || dirPath.Contains ".." then
         Error InvalidPath
     else
@@ -26,7 +27,8 @@ let private validateForm (ctx: HttpContext) : Result<IFormFile, UploadError> =
     | true, 0 -> Error NoFileUploaded
     | true, _ -> Ok ctx.Request.Form.Files.[0]
 
-let private ensureDirectory (rootDir: string) (dirPath: string) : Result<string, UploadError> =
+/// <summary>確認上傳目標目錄存在</summary>
+let ensureDirectory (rootDir: string) (dirPath: string) : Result<string, UploadError> =
     let fullPath = Path.Combine(rootDir, dirPath)
 
     if Directory.Exists fullPath then

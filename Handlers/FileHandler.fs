@@ -13,7 +13,8 @@ type DeleteFileError =
     | UnknownError of string
 
 
-let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], string> =
+/// <summary>列出指定子目錄檔案；拒絕 path traversal</summary>
+let safeGetFiles (rootDir: string) (subPath: string) : Result<string[], string> =
     if subPath.Contains "/" || subPath.Contains ".." then
         Error "Invalid path"
     else
@@ -24,7 +25,8 @@ let private safeGetFiles (rootDir: string) (subPath: string) : Result<string[], 
         with ex ->
             Error ex.Message
 
-let private safeGetAllFiles (rootDir: string) : Result<string[], string> =
+/// <summary>列出根目錄下各子資料夾內的檔案</summary>
+let safeGetAllFiles (rootDir: string) : Result<string[], string> =
     try
         Directory.GetDirectories(Path.Combine rootDir)
         |> Array.collect (fun subDir ->

@@ -20,5 +20,7 @@
     <Compile Include="TestSetup.fs" />
     <Compile Include="DtoModelTests.fs" />
     <Compile Include="FileHandlerTests.fs" />
+    <Compile Include="UploadHandlerTests.fs" />
+    <Compile Include="CreateDirectoryHandlerTests.fs" />
   </ItemGroup>
 </Project>
