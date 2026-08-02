@@ -22,3 +22,5 @@ module Response =
           Exp: int
           IsAdmin: bool
           CreatedAt: DateTime }
+
+    type RecentFileItem = { Path: string; CreatedAt: DateTime }

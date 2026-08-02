@@ -129,6 +129,7 @@ yarn dev
 | -------- | ------------------------------ | --- | -------------------------- |
 | `GET`    | `/api/directories`             | 否   | 列出資料夾                      |
 | `GET`    | `/api/files`                   | 否   | 列出檔案；可選 `?dir=`            |
+| `GET`    | `/api/files/recent`            | 否   | 最近檔案（最多 10 筆；可選 `?limit=`） |
 | `POST`   | `/api/login`                   | 否   | 登入，設定 `sid`                |
 | `POST`   | `/api/auth`                    | 是   | 驗證 session 是否有效            |
 | `POST`   | `/api/upload/{dir}`            | 是   | 上傳檔案到指定目錄                  |

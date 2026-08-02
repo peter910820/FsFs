@@ -73,3 +73,34 @@ let ``safeGetAllFiles collects files from child directories`` () =
     finally
         if Directory.Exists root then
             Directory.Delete(root, true)
+
+[<Fact>]
+let ``safeGetRecentFiles returns newest first and caps at 10`` () =
+    let root = Path.Combine(Path.GetTempPath(), $"fsfs-recent-{System.Guid.NewGuid():N}")
+    let sub = Path.Combine(root, "docs")
+    Directory.CreateDirectory sub |> ignore
+
+    let baseTime = System.DateTime.UtcNow.AddDays -1.0
+
+    for i in 1..12 do
+        let path = Path.Combine(sub, $"f{i}.txt")
+        File.WriteAllText(path, string i)
+        File.SetCreationTimeUtc(path, baseTime.AddMinutes(float i))
+
+    try
+        match safeGetRecentFiles root 10 with
+        | Ok files ->
+            Assert.Equal(10, files.Length)
+            Assert.True(files.[0].Path.Replace("\\", "/").EndsWith("docs/f12.txt"))
+            Assert.True(files.[files.Length - 1].Path.Replace("\\", "/").EndsWith("docs/f3.txt"))
+
+            for i in 0 .. files.Length - 2 do
+                Assert.True(files.[i].CreatedAt >= files.[i + 1].CreatedAt)
+        | Error msg -> Assert.Fail($"Expected Ok, got {msg}")
+
+        match safeGetRecentFiles root 99 with
+        | Ok files -> Assert.Equal(10, files.Length)
+        | Error msg -> Assert.Fail($"Expected Ok, got {msg}")
+    finally
+        if Directory.Exists root then
+            Directory.Delete(root, true)

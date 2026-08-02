@@ -14,7 +14,10 @@ open FsFs.Infrastructure.Middleware
 let apiRoutes : HttpHandler =
     choose
         [ GET
-          >=> choose [ route "/directories" >=> listFolders; route "/files" >=> listFile ]
+          >=> choose
+                  [ route "/directories" >=> listFolders
+                    route "/files/recent" >=> listRecentFiles
+                    route "/files" >=> listFile ]
           POST
           >=> choose
                   [ route "/auth" >=> authMiddleware >=> authHandler

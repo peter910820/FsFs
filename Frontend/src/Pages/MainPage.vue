@@ -2,22 +2,23 @@
 import { onMounted, ref } from "vue";
 
 import BlockError from "@/components/BlockError.vue";
-import { getFile } from "@/utils/apiHandler";
+import type { RecentFileItem } from "@/types/file";
+import { getRecentFiles } from "@/utils/apiHandler";
 import { fileIcon, openStaticFile } from "@/utils/files";
 
-const files = ref<string[]>([]);
+const files = ref<RecentFileItem[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
 const loadFiles = async () => {
   loading.value = true;
   error.value = null;
-  const response = await getFile();
+  const response = await getRecentFiles(10);
   if (response && response.status === 200) {
     files.value = response.data.data ?? [];
   } else {
     files.value = [];
-    error.value = response?.data?.msg ?? "無法取得檔案列表";
+    error.value = response?.data?.msg ?? "無法取得最近檔案";
   }
   loading.value = false;
 };
@@ -47,15 +48,16 @@ onMounted(loadFiles);
       <v-card rounded="xl" elevation="2">
         <v-skeleton-loader v-if="loading" type="list-item-avatar@5" />
         <BlockError v-else-if="error" :message="error" @retry="loadFiles" />
-        <v-list v-else-if="files.length" lines="one" class="py-2">
+        <v-list v-else-if="files.length" lines="two" class="py-2">
           <v-list-item
-            v-for="(item, index) in files"
-            :key="index"
-            :prepend-icon="fileIcon(item)"
-            :title="item"
+            v-for="item in files"
+            :key="item.path"
+            :prepend-icon="fileIcon(item.path)"
+            :title="item.path"
+            :subtitle="new Date(item.createdAt).toLocaleString()"
             rounded="lg"
             class="mx-2"
-            @click="openStaticFile(item)"
+            @click="openStaticFile(item.path)"
           >
             <template #append>
               <v-icon icon="mdi-open-in-new" size="small" class="text-medium-emphasis" />

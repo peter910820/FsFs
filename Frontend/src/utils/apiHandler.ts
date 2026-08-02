@@ -2,6 +2,7 @@ import axios from "axios";
 import type { AxiosResponse } from "axios";
 
 import type { ResponseType } from "@/types/response";
+import type { RecentFileItem } from "@/types/file";
 import type { LoginResponse } from "@/types/user";
 
 export const apiUrl = (path: string) => {
@@ -35,6 +36,15 @@ export const getFile = async (dir?: string): Promise<AxiosResponse> => {
     return await axios.get(url);
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) return error.response as AxiosResponse;
+    throw error;
+  }
+};
+
+export const getRecentFiles = async (limit = 10): Promise<AxiosResponse<ResponseType<RecentFileItem[]>>> => {
+  try {
+    return await axios.get(apiUrl(`/files/recent?limit=${limit}`));
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) return error.response as AxiosResponse<ResponseType<RecentFileItem[]>>;
     throw error;
   }
 };
