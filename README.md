@@ -93,6 +93,7 @@ yarn dev
 | `ALLOW_CORS`                                          | 允許的 CORS Origin                                              |
 | `CONTENT_ROOT`                                        | 檔案根目錄（實際存放上傳／列表的路徑）                                          |
 | `START_MODE`                                          | `NGINX`：靜態檔由外部代理；`Manual`：後端掛載 `/resource/*`                 |
+| `API_TOKENS`                                          | 逗號分隔的 Bearer tokens；供 server 上傳 API 使用（可留空）                    |
 
 
 
@@ -122,19 +123,20 @@ yarn dev
 
 ## API 概要
 
-所有 API 前綴為 `/api`。需登入的端點會檢查 Cookie `sid`。
+所有 API 前綴為 `/api`。需登入的端點檢查 Cookie `sid`；server 上傳端點改用 `Authorization: Bearer`（`API_TOKENS`）。
 
 
-| 方法       | 路徑                             | 認證  | 說明                         |
-| -------- | ------------------------------ | --- | -------------------------- |
-| `GET`    | `/api/directories`             | 否   | 列出資料夾                      |
-| `GET`    | `/api/files`                   | 否   | 列出檔案；可選 `?dir=`            |
-| `GET`    | `/api/files/recent`            | 否   | 最近檔案（最多 10 筆；可選 `?limit=`） |
-| `POST`   | `/api/login`                   | 否   | 登入，設定 `sid`                |
-| `POST`   | `/api/auth`                    | 是   | 驗證 session 是否有效            |
-| `POST`   | `/api/upload/{dir}`            | 是   | 上傳檔案到指定目錄                  |
-| `POST`   | `/api/create-directory/{name}` | 是   | 建立資料夾                      |
-| `DELETE` | `/api/file`                    | 是   | 刪除檔案（JSON body：`fileName`） |
+| 方法       | 路徑                             | 認證         | 說明                                      |
+| -------- | ------------------------------ | ---------- | --------------------------------------- |
+| `GET`    | `/api/directories`             | 否          | 列出資料夾                                   |
+| `GET`    | `/api/files`                   | 否          | 列出檔案；可選 `?dir=`                         |
+| `GET`    | `/api/files/recent`            | 否          | 最近檔案（最多 10 筆；可選 `?limit=`）              |
+| `POST`   | `/api/login`                   | 否          | 登入，設定 `sid`                             |
+| `POST`   | `/api/auth`                    | Cookie     | 驗證 session 是否有效                         |
+| `POST`   | `/api/upload/{dir}`            | Cookie     | 上傳檔案到指定目錄（multipart）                    |
+| `POST`   | `/api/server/upload/{dir}`     | Bearer     | server端上傳（`fileName` + `contentBase64`） |
+| `POST`   | `/api/create-directory/{name}` | Cookie     | 建立資料夾                                   |
+| `DELETE` | `/api/file`                    | Cookie     | 刪除檔案（JSON body：`fileName`）              |
 
 
 當 `START_MODE=Manual` 時，另提供 `/resource/{code\|image\|technology\|test\|test2}/...` 靜態檔路由。

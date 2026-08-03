@@ -30,7 +30,8 @@ type AppConfig =
       CookieSecure: bool
       CookieSameSite: SameSiteMode
       AllowCors: string
-      StartMode: string }
+      StartMode: string
+      ApiTokens: string list }
 
 let private checkEnvKey key =
     match Environment.GetEnvironmentVariable key with
@@ -52,12 +53,27 @@ let private optionalEnv key =
     | v when String.IsNullOrWhiteSpace v -> None
     | v -> Some v
 
+/// <summary>將逗號分隔的 API tokens 轉成 list（trim、略過空白）</summary>
+let parseApiTokens (raw: string) : string list =
+    if String.IsNullOrWhiteSpace raw then
+        []
+    else
+        raw.Split(',')
+        |> Array.map (fun t -> t.Trim())
+        |> Array.filter (fun t -> not (String.IsNullOrWhiteSpace t))
+        |> Array.toList
+
 let config =
     let isProduction = parseBool "IS_PRODUCTION"
     let domain = optionalEnv "DOMAIN"
 
     if isProduction && domain.IsNone then
         failwith "DOMAIN is required when IS_PRODUCTION=true"
+
+    let apiTokens =
+        match Environment.GetEnvironmentVariable "API_TOKENS" with
+        | null -> []
+        | v -> parseApiTokens v
 
     { DbHost = checkEnvKey "DB_HOST"
       DbUsername = checkEnvKey "DB_USERNAME"
@@ -71,4 +87,5 @@ let config =
       CookieSecure = isProduction
       CookieSameSite = if isProduction then SameSiteMode.None else SameSiteMode.Lax
       AllowCors = checkEnvKey "ALLOW_CORS"
-      StartMode = checkEnvKey "START_MODE" }
+      StartMode = checkEnvKey "START_MODE"
+      ApiTokens = apiTokens }

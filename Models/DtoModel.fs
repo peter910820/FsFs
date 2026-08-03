@@ -8,6 +8,8 @@ module Request =
 
     type DeleteFileRequest = { fileName: string }
 
+    type ServerUploadRequest = { fileName: string; contentBase64: string }
+
 /// <summary>Response DTO的結構定義</summary>
 module Response =
     type ApiResponse<'T> =
@@ -24,3 +26,5 @@ module Response =
           CreatedAt: DateTime }
 
     type RecentFileItem = { Path: string; CreatedAt: DateTime }
+
+    type ServerUploadResult = { Path: string; CreatedAt: DateTime }
