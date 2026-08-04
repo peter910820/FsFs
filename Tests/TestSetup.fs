@@ -15,3 +15,5 @@ do
     setEnv "DOMAIN" "localhost"
     setEnv "ALLOW_CORS" "*"
     setEnv "START_MODE" "Manual"
+    setEnv "IS_PRODUCTION" "false"
+    setEnv "API_TOKENS" "test-token-a,test-token-b"
