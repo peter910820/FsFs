@@ -44,7 +44,7 @@ let private saveFile (fullPath: string) (file: IFormFile) =
             do! file.CopyToAsync stream
             return Ok file.FileName
         with ex ->
-            return Error(UnknownError ex.Message)
+            return Error (UnknownError ex.Message)
     }
 
 let private toHttpResponse =
@@ -55,7 +55,7 @@ let private toHttpResponse =
     | Error NoFileUploaded -> responseFactory StatusCodes.Status400BadRequest "No file uploaded" None
     | Error DirectoryNotFound ->
         responseFactory StatusCodes.Status500InternalServerError "Upload directory does not exist" None
-    | Error(UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg None
+    | Error (UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg None
 
 let uploadHandler (dirPath: string) : HttpHandler =
     fun next ctx ->

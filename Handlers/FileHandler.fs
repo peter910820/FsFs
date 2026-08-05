@@ -99,13 +99,13 @@ let listRecentFiles : HttpHandler =
 /// <summary>刪除檔案，有副作用</summary>
 let safeDeleteFile path : Result<unit, DeleteFileError> =
     if not (File.Exists path) then
-        Error(FileNotFound path)
+        Error (FileNotFound path)
     else
         try
             File.Delete path
             Ok()
         with ex ->
-            Error(UnknownError ex.Message)
+            Error (UnknownError ex.Message)
 
 /// <summary>刪除檔案Handler</summary>
 let deleteFileHandler : HttpHandler =
@@ -116,8 +116,8 @@ let deleteFileHandler : HttpHandler =
             let handler =
                 match safeDeleteFile (Path.Combine(config.ContentRoot, req.fileName)) with
                 | Ok() -> responseFactory StatusCodes.Status200OK "刪除檔案成功" None
-                | Error(FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg (Some msg)
-                | Error(UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg (Some msg)
+                | Error (FileNotFound msg) -> responseFactory StatusCodes.Status500InternalServerError msg (Some msg)
+                | Error (UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg (Some msg)
 
             return! handler next ctx
         }

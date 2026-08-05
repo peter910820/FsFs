@@ -57,7 +57,7 @@ let writeUploadBytes (rootDir: string) (dirPath: string) (fileName: string) (byt
             { Response.ServerUploadResult.Path = Path.GetRelativePath(rootDir, savePath)
               Response.ServerUploadResult.CreatedAt = info.CreationTimeUtc }
     with ex ->
-        Error(UnknownError ex.Message)
+        Error (UnknownError ex.Message)
 
 let private mapUploadPathError =
     function
@@ -75,7 +75,7 @@ let private toHttpResponse =
     | Error InvalidBase64 -> responseFactory StatusCodes.Status400BadRequest "Invalid base64 content" None
     | Error DirectoryNotFound ->
         responseFactory StatusCodes.Status500InternalServerError "Upload directory does not exist" None
-    | Error(UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg None
+    | Error (UnknownError msg) -> responseFactory StatusCodes.Status500InternalServerError msg None
 
 let serverUploadHandler (dirPath: string) : HttpHandler =
     fun next ctx ->

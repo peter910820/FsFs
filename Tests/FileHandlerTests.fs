@@ -11,7 +11,7 @@ let ``safeDeleteFile returns FileNotFound when file does not exist`` () =
     let result = safeDeleteFile missingPath
 
     match result with
-    | Error(FileNotFound path) -> Assert.Equal(missingPath, path)
+    | Error (FileNotFound path) -> Assert.Equal(missingPath, path)
     | other -> Assert.Fail($"Expected FileNotFound, got {other}")
 
 [<Fact>]
