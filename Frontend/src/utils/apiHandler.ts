@@ -59,7 +59,6 @@ export const deleteFile = async (fileName: string) => {
 
 export const uploadFile = async (directory: string, formData: FormData) => {
   return axios.post(apiUrl(`/upload/${directory}`), formData, {
-    headers: { "Content-Type": "multipart/form-data" },
     withCredentials: true,
   });
 };

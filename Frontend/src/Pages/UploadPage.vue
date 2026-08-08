@@ -7,7 +7,7 @@ import { getDirectory, getErrorMessage, uploadFile } from "@/utils/apiHandler";
 
 const directories = ref<string[]>([]);
 const selectedDirectory = ref<string | null>(null);
-const file = ref<File[]>([]);
+const file = ref<File | File[] | null>(null);
 const fileName = ref("");
 const loading = ref(false);
 const loadingDirs = ref(true);
@@ -38,7 +38,7 @@ const isValidLinuxFileName = (name: string) => {
 };
 
 const upload = async () => {
-  const selectedFile = file.value[0];
+  const selectedFile = Array.isArray(file.value) ? file.value[0] : file.value;
   if (!selectedFile) {
     toastStore.show("請選擇檔案", "warning");
     return;
@@ -65,13 +65,12 @@ const upload = async () => {
   } else {
     formData.append("file", selectedFile);
   }
-  formData.append("directory", selectedDirectory.value);
 
   loading.value = true;
   try {
     await uploadFile(selectedDirectory.value, formData);
     toastStore.show("檔案上傳成功！", "success");
-    file.value = [];
+    file.value = null;
     fileName.value = "";
   } catch (error: unknown) {
     toastStore.show(getErrorMessage(error, "上傳失敗"), "error");
