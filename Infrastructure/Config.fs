@@ -19,6 +19,7 @@ let cache = new MemoryCache(MemoryCacheOptions())
 
 type AppConfig =
     { DbHost: string
+      DbPort: string
       DbUsername: string
       DbPassword: string
       DbName: string
@@ -76,6 +77,7 @@ let config =
         | v -> parseApiTokens v
 
     { DbHost = checkEnvKey "DB_HOST"
+      DbPort = checkEnvKey "DB_PORT"
       DbUsername = checkEnvKey "DB_USERNAME"
       DbPassword = checkEnvKey "DB_PASSWORD"
       DbName = checkEnvKey "DB_NAME"

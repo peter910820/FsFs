@@ -43,6 +43,7 @@ let configureServices (services: IServiceCollection) =
     let connectionString =
         [
             $"Host={config.DbHost}"
+            $"Port={config.DbPort}"
             $"Username={config.DbUsername}"
             $"Password={config.DbPassword}"
             $"Database={config.DbName}"

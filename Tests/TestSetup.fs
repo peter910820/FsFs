@@ -6,6 +6,7 @@ let private setEnv key value =
 
 do
     setEnv "DB_HOST" "localhost"
+    setEnv "DB_PORT" "5432"
     setEnv "DB_USERNAME" "test"
     setEnv "DB_PASSWORD" "test"
     setEnv "DB_NAME" "test"

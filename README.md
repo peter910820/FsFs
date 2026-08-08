@@ -85,7 +85,7 @@ yarn dev
 
 | 變數                                                    | 說明                                                           |
 | ----------------------------------------------------- | ------------------------------------------------------------ |
-| `DB_HOST` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` | PostgreSQL 連線                                                |
+| `DB_HOST` / `DB_PORT` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` | PostgreSQL 連線                                                |
 | `DB_MAX_POOL_SIZE`                                    | 連線池上限                                                        |
 | `RUNTIME_PORT`                                        | 監聽位址，例如 `http://127.0.0.1:3023`                              |
 | `IS_PRODUCTION`                                       | `false` 本機／`true` 生產；決定 cookie 的 Secure、SameSite、是否套用 Domain |
