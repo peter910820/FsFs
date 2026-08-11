@@ -35,11 +35,13 @@ let ``ApiResponse with None data serializes data as null`` () =
     Assert.Contains(""""data":null""", json)
 
 [<Fact>]
-let ``LoginResponse serializes with camelCase`` () =
+let ``LoginResponse serializes with camelCase including isAdmin`` () =
     let resp: Response.LoginResponse =
         { Username = "seaotterms"
-          Name = "SeaOtter"
+          Email = "p@example.com"
           Avatar = ""
+          Exp = 1
+          IsAdmin = true
           CreatedAt = System.DateTime(2024, 1, 1, 0, 0, 0, System.DateTimeKind.Utc) }
 
     let options =
@@ -48,8 +50,8 @@ let ``LoginResponse serializes with camelCase`` () =
     let json = JsonSerializer.Serialize(resp, options)
 
     Assert.Contains(""""username":"seaotterms""", json)
-    Assert.Contains(""""name":"SeaOtter""", json)
-    Assert.Contains(""""avatar":""", json)
+    Assert.Contains(""""isAdmin":true""", json)
+    Assert.Contains(""""exp":1""", json)
 
 [<Fact>]
 let ``DeleteFileRequest holds fileName`` () =

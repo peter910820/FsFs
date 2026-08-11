@@ -12,8 +12,7 @@ const { status, user } = authStore;
 const isDark = computed(() => themeStore.current.value === "dark");
 const displayName = computed(() => {
   if (!user.value) return "";
-  const name = user.value.name || user.value.username;
-  return `${name}/管理員`;
+  return user.value.isAdmin ? `${user.value.username}/管理員` : user.value.username;
 });
 
 const toggleTheme = (event: MouseEvent) => {
@@ -55,7 +54,7 @@ const toggleTheme = (event: MouseEvent) => {
       <template v-if="status && user">
         <div class="d-flex align-center ga-3 user-chip px-3 py-1">
           <v-avatar size="40" color="primary" rounded="circle">
-            <v-img v-if="user.avatar" :src="user.avatar" :alt="user.name || user.username" />
+            <v-img v-if="user.avatar" :src="user.avatar" :alt="user.username" />
             <v-icon v-else icon="mdi-account" />
           </v-avatar>
           <span class="text-body-2 font-weight-medium d-none d-sm-inline">{{ displayName }}</span>
