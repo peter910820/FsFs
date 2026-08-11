@@ -13,14 +13,26 @@ type AppDbContext(options: DbContextOptions<AppDbContext>) =
     [<DefaultValue>]
     val mutable private users: DbSet<User>
 
+    [<DefaultValue>]
+    val mutable private userAuths: DbSet<UserAuth>
+
     member this.Users
         with get () = this.users
         and set v = this.users <- v
 
-let tryFindUserByUpdateName (db: AppDbContext) (username: string) =
-    task {
-        let! user = db.Users.AsNoTracking().FirstOrDefaultAsync(fun u -> u.Username = username)
+    member this.UserAuths
+        with get () = this.userAuths
+        and set v = this.userAuths <- v
 
+let tryFindAuthByUsername (db: AppDbContext) (username: string) =
+    task {
+        let! auth = db.UserAuths.AsNoTracking().FirstOrDefaultAsync(fun a -> a.Username = username)
+        return Option.ofObj auth
+    }
+
+let tryFindUserById (db: AppDbContext) (userId: int) =
+    task {
+        let! user = db.Users.AsNoTracking().FirstOrDefaultAsync(fun u -> u.Id = userId)
         return Option.ofObj user
     }
 
