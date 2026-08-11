@@ -14,32 +14,50 @@ type User =
     { [<Column("id")>]
       Id: int
 
+      [<Column("name")>]
+      [<Required>]
+      Name: string
+
+      [<Column("discord_id")>]
+      DiscordId: string
+
+      [<Column("avatar")>]
+      Avatar: string
+
+      [<Column("description")>]
+      Description: string
+
+      [<Column("private_game_data")>]
+      PrivateGameData: bool
+
+      [<Column("role")>]
+      Role: int
+
+      [<Column("created_at")>]
+      CreatedAt: DateTime
+
+      [<Column("updated_at")>]
+      UpdatedAt: DateTime }
+
+[<CLIMutable>]
+[<Table("user_auths")>]
+type UserAuth =
+    { [<Column("user_id")>]
+      [<Key>]
+      [<DatabaseGenerated(DatabaseGeneratedOption.None)>]
+      UserId: int
+
       [<Column("username")>]
       [<Required>]
+      [<MaxLength(30)>]
       Username: string
 
       [<Column("password")>]
       [<Required>]
       Password: string
 
-      [<Column("email")>]
-      [<Required>]
-      Email: string
-
-      [<Column("avatar")>]
-      Avatar: string
-
-      [<Column("exp")>]
-      Exp: int
-
-      [<Column("is_admin")>]
-      IsAdmin: bool
-
       [<Column("created_at")>]
       CreatedAt: DateTime
 
       [<Column("updated_at")>]
-      UpdatedAt: DateTime
-
-      [<Column("deleted_at")>]
-      DeletedAt: DateTime Nullable }
+      UpdatedAt: DateTime }

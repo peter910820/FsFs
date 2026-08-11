@@ -19,10 +19,8 @@ module Response =
 
     type LoginResponse =
         { Username: string
-          Email: string
+          Name: string
           Avatar: string
-          Exp: int
-          IsAdmin: bool
           CreatedAt: DateTime }
 
     type RecentFileItem = { Path: string; CreatedAt: DateTime }
